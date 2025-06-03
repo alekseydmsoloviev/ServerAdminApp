@@ -1,6 +1,7 @@
 package com.example.serveradminapp;
 
 import android.os.Bundle;
+
 import android.app.AlertDialog;
 import android.text.InputType;
 import android.widget.ArrayAdapter;
@@ -20,11 +21,13 @@ import okhttp3.RequestBody;
 import okhttp3.MediaType;
 
 
+
 public class UsersActivity extends AppCompatActivity {
 
     private ListView listView;
     private ArrayAdapter<String> adapter;
     private ArrayList<String> userList = new ArrayList<>();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +35,7 @@ public class UsersActivity extends AppCompatActivity {
         setContentView(R.layout.activity_users);
 
         listView = findViewById(R.id.users_list);
+
         Button addButton = findViewById(R.id.add_user_button);
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, userList);
         listView.setAdapter(adapter);
@@ -133,5 +137,6 @@ public class UsersActivity extends AppCompatActivity {
                 loadUsers();
             }
         });
+
     }
 }
