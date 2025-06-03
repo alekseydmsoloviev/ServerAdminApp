@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.TextView;
+import android.view.View;
+import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import org.json.JSONException;
@@ -21,6 +23,8 @@ public class MainActivity extends AppCompatActivity {
     private TextView uptimeText;
     private TextView messages24hText;
     private TextView messages7dText;
+    private View[] weekBars = new View[7];
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +40,15 @@ public class MainActivity extends AppCompatActivity {
         uptimeText = findViewById(R.id.uptime_text);
         messages24hText = findViewById(R.id.messages_24h_text);
         messages7dText = findViewById(R.id.messages_7d_text);
+
+        weekBars[0] = findViewById(R.id.bar1);
+        weekBars[1] = findViewById(R.id.bar2);
+        weekBars[2] = findViewById(R.id.bar3);
+        weekBars[3] = findViewById(R.id.bar4);
+        weekBars[4] = findViewById(R.id.bar5);
+        weekBars[5] = findViewById(R.id.bar6);
+        weekBars[6] = findViewById(R.id.bar7);
+
 
         Button usersButton = findViewById(R.id.users_button);
         Button modelsButton = findViewById(R.id.models_button);
@@ -95,6 +108,12 @@ public class MainActivity extends AppCompatActivity {
         ServerApi.get().fetchUsage(new Callback() {
             @Override
             public void onFailure(@NonNull okhttp3.Call call, @NonNull IOException e) {
+
+                runOnUiThread(() -> {
+                    messages24hText.setText("Messages last 24h: --");
+                    messages7dText.setText("Messages last 7 days: --");
+                });
+
             }
 
             @Override
@@ -104,52 +123,77 @@ public class MainActivity extends AppCompatActivity {
                 response.close();
                 try {
                     JSONObject obj = new JSONObject(body);
-                    int dayCount = 0;
+
+
+                    int dayCount = extractSum(obj.opt("day"));
+                    int[] weekArray = extractArray(obj.opt("week"));
                     int weekCount = 0;
-                    if (obj.has("day")) {
-                        Object day = obj.get("day");
-                        if (day instanceof Number) {
-                            dayCount = ((Number) day).intValue();
-                        } else if (day instanceof JSONObject) {
-                            java.util.Iterator<String> dKeys = ((JSONObject) day).keys();
-                            while (dKeys.hasNext()) {
-                                Object val = ((JSONObject) day).get(dKeys.next());
-                                if (val instanceof Number) dayCount += ((Number) val).intValue();
-                            }
-                        }
+                    for (int w : weekArray) weekCount += w;
+
+                    if (dayCount == 0) dayCount = extractSum(obj.opt("last24h"));
+                    if (weekArray.length == 0) {
+                        weekArray = extractArray(obj.opt("last7d"));
+                        for (int w : weekArray) weekCount += w;
                     }
-                    if (obj.has("week")) {
-                        Object week = obj.get("week");
-                        if (week instanceof JSONArray) {
-                            JSONArray arr = (JSONArray) week;
-                            for (int i = 0; i < arr.length(); i++) weekCount += arr.optInt(i);
-                        } else if (week instanceof JSONObject) {
-                            java.util.Iterator<String> wKeys = ((JSONObject) week).keys();
-                            while (wKeys.hasNext()) {
-                                Object val = ((JSONObject) week).get(wKeys.next());
-                                if (val instanceof Number) weekCount += ((Number) val).intValue();
-                            }
-                        } else if (week instanceof Number) {
-                            weekCount = ((Number) week).intValue();
-                        }
-                    }
-                    if (weekCount == 0) {
-                        // Fallback: sum all numeric values
-                        java.util.Iterator<String> keys = obj.keys();
-                        while (keys.hasNext()) {
-                            Object val = obj.get(keys.next());
-                            if (val instanceof Number) weekCount += ((Number) val).intValue();
-                        }
-                    }
-                    if (dayCount == 0) dayCount = weekCount; // at least show something
+                    if (weekCount == 0) weekCount = extractSum(obj); // fallback
+
+                    final int[] weekBarsValues = weekArray;
+
                     final int count24h = dayCount;
                     final int count7d = weekCount;
                     runOnUiThread(() -> {
                         messages24hText.setText("Messages last 24h: " + count24h);
                         messages7dText.setText("Messages last 7 days: " + count7d);
+
+                        updateWeekChart(weekBarsValues);
+
                     });
                 } catch (JSONException ignored) {}
             }
         });
+    }
+
+    private int extractSum(Object obj) throws JSONException {
+        if (obj == null) return 0;
+        if (obj instanceof Number) return ((Number) obj).intValue();
+        int sum = 0;
+        if (obj instanceof JSONArray) {
+            JSONArray arr = (JSONArray) obj;
+            for (int i = 0; i < arr.length(); i++) {
+                sum += extractSum(arr.get(i));
+            }
+        } else if (obj instanceof JSONObject) {
+            JSONObject o = (JSONObject) obj;
+            java.util.Iterator<String> it = o.keys();
+            while (it.hasNext()) {
+                sum += extractSum(o.get(it.next()));
+            }
+        } else if (obj instanceof String) {
+            try { sum = Integer.parseInt((String) obj); } catch (NumberFormatException ignored) {}
+        }
+        return sum;
+    }
+
+    private int[] extractArray(Object obj) throws JSONException {
+        if (obj instanceof JSONArray) {
+            JSONArray arr = (JSONArray) obj;
+            int[] result = new int[arr.length()];
+            for (int i = 0; i < arr.length(); i++) result[i] = arr.optInt(i);
+            return result;
+        }
+        return new int[0];
+    }
+
+    private void updateWeekChart(int[] counts) {
+        int max = 0;
+        for (int c : counts) if (c > max) max = c;
+        for (int i = 0; i < weekBars.length; i++) {
+            View bar = weekBars[i];
+            int val = i < counts.length ? counts[i] : 0;
+            int height = max == 0 ? 0 : (int) (100 * (val / (float) max));
+            ViewGroup.LayoutParams lp = bar.getLayoutParams();
+            lp.height = (int) (height * bar.getContext().getResources().getDisplayMetrics().density);
+            bar.setLayoutParams(lp);
+        }
     }
 }
