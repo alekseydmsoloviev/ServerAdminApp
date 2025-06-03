@@ -8,6 +8,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONArray;
 import java.io.IOException;
 import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
@@ -103,13 +104,46 @@ public class MainActivity extends AppCompatActivity {
                 response.close();
                 try {
                     JSONObject obj = new JSONObject(body);
-                    int total = 0;
-                    java.util.Iterator<String> keys = obj.keys();
-                    while (keys.hasNext()) {
-                        total += obj.getInt(keys.next());
+                    int dayCount = 0;
+                    int weekCount = 0;
+                    if (obj.has("day")) {
+                        Object day = obj.get("day");
+                        if (day instanceof Number) {
+                            dayCount = ((Number) day).intValue();
+                        } else if (day instanceof JSONObject) {
+                            java.util.Iterator<String> dKeys = ((JSONObject) day).keys();
+                            while (dKeys.hasNext()) {
+                                Object val = ((JSONObject) day).get(dKeys.next());
+                                if (val instanceof Number) dayCount += ((Number) val).intValue();
+                            }
+                        }
                     }
-                    final int count24h = total; // approximate usage count
-                    final int count7d = total; // placeholder since API lacks breakdown
+                    if (obj.has("week")) {
+                        Object week = obj.get("week");
+                        if (week instanceof JSONArray) {
+                            JSONArray arr = (JSONArray) week;
+                            for (int i = 0; i < arr.length(); i++) weekCount += arr.optInt(i);
+                        } else if (week instanceof JSONObject) {
+                            java.util.Iterator<String> wKeys = ((JSONObject) week).keys();
+                            while (wKeys.hasNext()) {
+                                Object val = ((JSONObject) week).get(wKeys.next());
+                                if (val instanceof Number) weekCount += ((Number) val).intValue();
+                            }
+                        } else if (week instanceof Number) {
+                            weekCount = ((Number) week).intValue();
+                        }
+                    }
+                    if (weekCount == 0) {
+                        // Fallback: sum all numeric values
+                        java.util.Iterator<String> keys = obj.keys();
+                        while (keys.hasNext()) {
+                            Object val = obj.get(keys.next());
+                            if (val instanceof Number) weekCount += ((Number) val).intValue();
+                        }
+                    }
+                    if (dayCount == 0) dayCount = weekCount; // at least show something
+                    final int count24h = dayCount;
+                    final int count7d = weekCount;
                     runOnUiThread(() -> {
                         messages24hText.setText("Messages last 24h: " + count24h);
                         messages7dText.setText("Messages last 7 days: " + count7d);
