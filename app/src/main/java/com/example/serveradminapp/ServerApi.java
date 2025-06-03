@@ -31,6 +31,7 @@ public class ServerApi {
     private final OkHttpClient client = new OkHttpClient();
 
     private ServerApi(String baseUrl, String username, String password) {
+
         String url = baseUrl;
         if (!url.startsWith("http")) {
             url = "http://" + url;
@@ -41,6 +42,7 @@ public class ServerApi {
         url = url.replace("://localhost", "://10.0.2.2")
                    .replace("://127.0.0.1", "://10.0.2.2");
         this.baseUrl = url;
+
         String creds = username + ":" + password;
         this.authHeader = "Basic " + Base64.encodeToString(creds.getBytes(StandardCharsets.UTF_8), Base64.NO_WRAP);
     }
@@ -141,4 +143,5 @@ public class ServerApi {
         }
         return result;
     }
+
 }
