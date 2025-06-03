@@ -24,7 +24,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         ServerApi.restore(this);
         if (ServerApi.get() == null) {
             startActivity(new Intent(this, LoginActivity.class));
@@ -109,8 +108,12 @@ public class MainActivity extends AppCompatActivity {
                     while (keys.hasNext()) {
                         total += obj.getInt(keys.next());
                     }
-                    final int count24h = total; // approximate
-                    runOnUiThread(() -> messages24hText.setText("Messages: " + count24h));
+                    final int count24h = total; // approximate usage count
+                    final int count7d = total; // placeholder since API lacks breakdown
+                    runOnUiThread(() -> {
+                        messages24hText.setText("Messages last 24h: " + count24h);
+                        messages7dText.setText("Messages last 7 days: " + count7d);
+                    });
                 } catch (JSONException ignored) {}
             }
         });
