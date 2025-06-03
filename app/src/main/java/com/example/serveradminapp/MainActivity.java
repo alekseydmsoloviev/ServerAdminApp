@@ -26,7 +26,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         ServerApi.restore(this);
-
         if (ServerApi.get() == null) {
             startActivity(new Intent(this, LoginActivity.class));
             finish();

@@ -122,7 +122,6 @@ public class ServerApi {
     }
 
     public void installModel(@NonNull String name, @NonNull Callback callback) {
-
         Request request = baseRequest("/admin/api/models/" + name + "/install")
                 .post(RequestBody.create(new byte[0]))
                 .build();
@@ -134,8 +133,17 @@ public class ServerApi {
      * URL path as required by the server.
      */
     public void installModelVariant(@NonNull String variant, @NonNull Callback callback) {
-        String encoded = java.net.URLEncoder.encode(variant, java.nio.charset.StandardCharsets.UTF_8);
-        Request request = baseRequest("/admin/api/models/" + encoded + "/install")
+        // Variant already includes the model name and parameter count like
+        // "gemma3:12b". Build the URL manually so that the colon is not
+        // percent-encoded which would break the endpoint on the server.
+        okhttp3.HttpUrl url = okhttp3.HttpUrl.parse(baseUrl).newBuilder()
+                .addPathSegments("admin/api/models")
+                .addEncodedPathSegment(variant)
+                .addPathSegment("install")
+                .build();
+        Request request = new Request.Builder()
+                .url(url)
+                .addHeader("Authorization", authHeader)
                 .post(RequestBody.create(new byte[0]))
                 .build();
         client.newCall(request).enqueue(callback);
