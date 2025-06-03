@@ -36,6 +36,8 @@ public class ModelsActivity extends AppCompatActivity {
     private TextView progressText;
     private okhttp3.WebSocket ws;
 
+    private String installingVariant;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -176,16 +178,20 @@ public class ModelsActivity extends AppCompatActivity {
         String model = (String) availableSpinner.getSelectedItem();
         String variant = (String) variantSpinner.getSelectedItem();
         String fullVariant = variant.contains(":" ) ? variant : model + ":" + variant;
+
+        installingVariant = fullVariant;
         ServerApi.get().installModelVariant(fullVariant, new okhttp3.Callback() {
             @Override
             public void onFailure(@NonNull okhttp3.Call call, @NonNull IOException e) {
-                runOnUiThread(() -> android.widget.Toast.makeText(ModelsActivity.this, "Error", android.widget.Toast.LENGTH_SHORT).show());
+                installingVariant = null;
+                runOnUiThread(() -> android.widget.Toast.makeText(ModelsActivity.this, "Install request failed", android.widget.Toast.LENGTH_SHORT).show());
             }
 
             @Override
             public void onResponse(@NonNull okhttp3.Call call, @NonNull okhttp3.Response response) throws IOException {
                 response.close();
-                loadModels();
+
+                // models list will refresh via WebSocket metrics
             }
         });
     }
@@ -198,7 +204,21 @@ public class ModelsActivity extends AppCompatActivity {
                     org.json.JSONObject obj = new org.json.JSONObject(text);
                     if ("progress".equals(obj.optString("type"))) {
                         String data = obj.optString("data");
-                        runOnUiThread(() -> progressText.setText(data));
+                        String parsed = parseProgressLine(data);
+                        if (parsed != null) {
+                            if ("success".equals(parsed)) {
+                                String name = installingVariant;
+                                installingVariant = null;
+                                runOnUiThread(() -> {
+                                    progressText.setText("");
+                                    android.widget.Toast.makeText(ModelsActivity.this,
+                                            "модель " + name + " успешно установлена",
+                                            android.widget.Toast.LENGTH_SHORT).show();
+                                });
+                            } else {
+                                runOnUiThread(() -> progressText.setText(parsed));
+                            }
+                        }
                     } else if (obj.has("models")) {
                         org.json.JSONArray arr = obj.getJSONArray("models");
                         modelList.clear();
@@ -206,11 +226,40 @@ public class ModelsActivity extends AppCompatActivity {
                             modelList.add(arr.getString(i));
                         }
                         runOnUiThread(() -> adapter.notifyDataSetChanged());
+                        if (installingVariant != null) {
+                            for (int i = 0; i < arr.length(); i++) {
+                                if (installingVariant.equals(arr.getString(i))) {
+                                    final String name = installingVariant;
+                                    installingVariant = null;
+                                    runOnUiThread(() -> android.widget.Toast.makeText(
+                                            ModelsActivity.this,
+                                            "модель " + name + " успешно установлена",
+                                            android.widget.Toast.LENGTH_SHORT).show());
+                                    break;
+                                }
+                            }
+                        }
                     }
                 } catch (org.json.JSONException ignored) {
                 }
             }
         });
+    }
+
+    private String parseProgressLine(String line) {
+        // remove ANSI escape codes and control characters
+        line = line.replaceAll("\\u001B\\[[0-9;]*[A-Za-z]", "");
+        line = line.replaceAll("[\\r\\n]", " ");
+        line = line.replaceAll("[\\x00-\\x1F]", "");
+        if (line.contains("success")) {
+            return "success";
+        }
+        java.util.regex.Matcher m = java.util.regex.Pattern.compile(
+                "(\\d+)%.*?([0-9.]+ [kMG]B/s).*?(\\d+s)").matcher(line);
+        if (m.find()) {
+            return m.group(1) + "% " + m.group(2) + " " + m.group(3);
+        }
+        return null;
     }
 
     @Override
