@@ -7,6 +7,7 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
+
 import java.util.ArrayList;
 
 import androidx.annotation.NonNull;
@@ -22,6 +23,7 @@ public class ModelsActivity extends AppCompatActivity {
     private ArrayList<String> modelList = new ArrayList<>();
     private ArrayAdapter<String> adapter;
     private ListView listView;
+
     private Spinner availableSpinner;
     private Spinner variantSpinner;
     private ArrayAdapter<String> availableAdapter;
@@ -30,6 +32,7 @@ public class ModelsActivity extends AppCompatActivity {
     private ArrayList<String> variantList = new ArrayList<>();
     private TextView progressText;
     private okhttp3.WebSocket ws;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +47,9 @@ public class ModelsActivity extends AppCompatActivity {
         availableSpinner = findViewById(R.id.available_spinner);
         variantSpinner = findViewById(R.id.variant_spinner);
         Button installButton = findViewById(R.id.install_model_button);
+
         progressText = findViewById(R.id.progress_text);
+
 
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, modelList);
         listView.setAdapter(adapter);
@@ -68,6 +73,7 @@ public class ModelsActivity extends AppCompatActivity {
         loadAvailableModels();
         connectMetrics();
         installButton.setOnClickListener(v -> installSelected());
+
         listView.setOnItemLongClickListener((parent, view, position, id) -> {
             String model = modelList.get(position);
             deleteModel(model);
@@ -105,7 +111,9 @@ public class ModelsActivity extends AppCompatActivity {
         });
     }
 
+
     private void loadAvailableModels() {
+
         ServerApi.get().availableModels(new okhttp3.Callback() {
             @Override
             public void onFailure(@NonNull okhttp3.Call call, @NonNull IOException e) {
@@ -123,6 +131,7 @@ public class ModelsActivity extends AppCompatActivity {
                 response.close();
                 try {
                     JSONArray arr = new JSONArray(body);
+
                     availableList.clear();
                     for (int i = 0; i < arr.length(); i++) {
                         availableList.add(arr.getString(i));
@@ -158,6 +167,7 @@ public class ModelsActivity extends AppCompatActivity {
                         variantList.add(arr.getString(i));
                     }
                     runOnUiThread(() -> variantAdapter.notifyDataSetChanged());
+
                 } catch (JSONException ex) {
                     onFailure(call, new IOException(ex));
                 }
@@ -165,12 +175,14 @@ public class ModelsActivity extends AppCompatActivity {
         });
     }
 
+
     private void installSelected() {
         if (availableList.isEmpty() || variantList.isEmpty()) return;
         String model = (String) availableSpinner.getSelectedItem();
         String variant = (String) variantSpinner.getSelectedItem();
         String fullVariant = variant.contains(":" ) ? variant : model + ":" + variant;
         ServerApi.get().installModel(model, fullVariant, new okhttp3.Callback() {
+
             @Override
             public void onFailure(@NonNull okhttp3.Call call, @NonNull IOException e) {
                 runOnUiThread(() -> android.widget.Toast.makeText(ModelsActivity.this, "Error", android.widget.Toast.LENGTH_SHORT).show());
@@ -205,6 +217,7 @@ public class ModelsActivity extends AppCompatActivity {
         if (ws != null) ws.close(1000, null);
         super.onDestroy();
     }
+
 
     private void deleteModel(String name) {
         ServerApi.get().deleteModel(name, new okhttp3.Callback() {
