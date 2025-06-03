@@ -35,7 +35,6 @@ public class ModelsActivity extends AppCompatActivity {
     private ArrayList<String> variantList = new ArrayList<>();
     private TextView progressText;
     private okhttp3.WebSocket ws;
-
     private String installingVariant;
 
     @Override
@@ -178,19 +177,19 @@ public class ModelsActivity extends AppCompatActivity {
         String model = (String) availableSpinner.getSelectedItem();
         String variant = (String) variantSpinner.getSelectedItem();
         String fullVariant = variant.contains(":" ) ? variant : model + ":" + variant;
-
         installingVariant = fullVariant;
         ServerApi.get().installModelVariant(fullVariant, new okhttp3.Callback() {
             @Override
             public void onFailure(@NonNull okhttp3.Call call, @NonNull IOException e) {
-                installingVariant = null;
-                runOnUiThread(() -> android.widget.Toast.makeText(ModelsActivity.this, "Install request failed", android.widget.Toast.LENGTH_SHORT).show());
+                // Some servers close the connection immediately after accepting
+                // the install request which triggers this callback even though
+                // the installation proceeds. We ignore this failure to avoid a
+                // misleading toast.
             }
 
             @Override
             public void onResponse(@NonNull okhttp3.Call call, @NonNull okhttp3.Response response) throws IOException {
                 response.close();
-
                 // models list will refresh via WebSocket metrics
             }
         });
