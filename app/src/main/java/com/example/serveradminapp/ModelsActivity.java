@@ -11,6 +11,7 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.ImageButton;
+
 import java.util.ArrayList;
 
 import androidx.annotation.NonNull;
@@ -34,6 +35,7 @@ public class ModelsActivity extends AppCompatActivity {
     private ArrayList<String> variantList = new ArrayList<>();
     private TextView progressText;
     private okhttp3.WebSocket ws;
+
     private String installingVariant;
 
     @Override
@@ -176,6 +178,7 @@ public class ModelsActivity extends AppCompatActivity {
         String model = (String) availableSpinner.getSelectedItem();
         String variant = (String) variantSpinner.getSelectedItem();
         String fullVariant = variant.contains(":" ) ? variant : model + ":" + variant;
+
         installingVariant = fullVariant;
         ServerApi.get().installModelVariant(fullVariant, new okhttp3.Callback() {
             @Override
@@ -187,6 +190,7 @@ public class ModelsActivity extends AppCompatActivity {
             @Override
             public void onResponse(@NonNull okhttp3.Call call, @NonNull okhttp3.Response response) throws IOException {
                 response.close();
+
                 // models list will refresh via WebSocket metrics
             }
         });
