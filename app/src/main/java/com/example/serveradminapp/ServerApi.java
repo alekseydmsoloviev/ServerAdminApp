@@ -31,11 +31,18 @@ public class ServerApi {
     private final OkHttpClient client = new OkHttpClient();
 
     private ServerApi(String baseUrl, String username, String password) {
-        if (!baseUrl.startsWith("http")) {
-            this.baseUrl = "http://" + baseUrl;
-        } else {
-            this.baseUrl = baseUrl;
+
+        String url = baseUrl;
+        if (!url.startsWith("http")) {
+            url = "http://" + url;
         }
+        // When running inside an emulator, localhost refers to the device
+        // itself. Replace it with the special 10.0.2.2 host so that the user
+        // can simply enter "localhost:port".
+        url = url.replace("://localhost", "://10.0.2.2")
+                   .replace("://127.0.0.1", "://10.0.2.2");
+        this.baseUrl = url;
+
         String creds = username + ":" + password;
         this.authHeader = "Basic " + Base64.encodeToString(creds.getBytes(StandardCharsets.UTF_8), Base64.NO_WRAP);
     }

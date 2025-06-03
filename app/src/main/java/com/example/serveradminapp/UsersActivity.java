@@ -25,7 +25,6 @@ import okhttp3.MediaType;
 public class UsersActivity extends AppCompatActivity {
 
     private ListView listView;
-
     private ArrayAdapter<String> adapter;
     private ArrayList<String> userList = new ArrayList<>();
 
