@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.ServerAdminApp" parent="android:Theme.Material.Light.NoActionBar" />
+    <!-- Use a MaterialComponents theme compatible with AppCompatActivity -->
+    <style name="Theme.ServerAdminApp" parent="Theme.MaterialComponents.DayNight.NoActionBar" />
 </resources>
