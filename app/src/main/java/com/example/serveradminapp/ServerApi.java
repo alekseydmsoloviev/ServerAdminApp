@@ -96,6 +96,7 @@ public class ServerApi {
     }
 
     public void installModel(@NonNull String name, @NonNull Callback callback) {
+
         Request request = baseRequest("/admin/api/models/" + name + "/install")
                 .post(RequestBody.create(new byte[0]))
                 .build();
