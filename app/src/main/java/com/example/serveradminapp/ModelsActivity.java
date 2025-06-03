@@ -1,6 +1,7 @@
 package com.example.serveradminapp;
 
 import android.os.Bundle;
+
 import android.app.AlertDialog;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -21,10 +22,12 @@ public class ModelsActivity extends AppCompatActivity {
     private ArrayAdapter<String> adapter;
     private ListView listView;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_models);
+
         listView = findViewById(R.id.models_list);
         Button installButton = findViewById(R.id.install_model_button);
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, modelList);
@@ -127,5 +130,6 @@ public class ModelsActivity extends AppCompatActivity {
                 loadModels();
             }
         });
+
     }
 }
