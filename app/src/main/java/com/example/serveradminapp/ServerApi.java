@@ -1,7 +1,8 @@
 package com.example.serveradminapp;
 
 import android.util.Base64;
-
+import android.content.Context;
+import android.content.SharedPreferences;
 import androidx.annotation.NonNull;
 
 import org.json.JSONArray;
@@ -26,6 +27,10 @@ import okhttp3.WebSocketListener;
  */
 public class ServerApi {
     private static ServerApi instance;
+    private static final String PREFS = "server_api";
+    private static final String KEY_URL = "url";
+    private static final String KEY_USER = "user";
+    private static final String KEY_PASS = "pass";
 
     private final String baseUrl;
     private final String authHeader;
@@ -48,6 +53,27 @@ public class ServerApi {
 
     public static void init(String baseUrl, String username, String password) {
         instance = new ServerApi(baseUrl, username, password);
+    }
+
+    /** Persist credentials so the API can be restored if the process is killed. */
+    public static void saveCredentials(Context ctx, String baseUrl, String user, String pass) {
+        SharedPreferences prefs = ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+        prefs.edit().putString(KEY_URL, baseUrl)
+                .putString(KEY_USER, user)
+                .putString(KEY_PASS, pass)
+                .apply();
+    }
+
+    /** Restore previously saved credentials if available. */
+    public static void restore(Context ctx) {
+        if (instance != null) return;
+        SharedPreferences prefs = ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+        String url = prefs.getString(KEY_URL, null);
+        String user = prefs.getString(KEY_USER, null);
+        String pass = prefs.getString(KEY_PASS, null);
+        if (url != null && user != null && pass != null) {
+            instance = new ServerApi(url, user, pass);
+        }
     }
 
     public static ServerApi get() {

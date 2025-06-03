@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
+import android.content.SharedPreferences;
+
 
 import androidx.annotation.NonNull;
 import java.io.IOException;
@@ -23,6 +25,12 @@ public class LoginActivity extends AppCompatActivity {
         usernameEdit = findViewById(R.id.username_edit);
         passwordEdit = findViewById(R.id.password_edit);
         serverEdit = findViewById(R.id.server_edit);
+        ServerApi.restore(this);
+        SharedPreferences prefs = getSharedPreferences("server_api", MODE_PRIVATE);
+        serverEdit.setText(prefs.getString("url", ""));
+        usernameEdit.setText(prefs.getString("user", ""));
+        passwordEdit.setText(prefs.getString("pass", ""));
+
         Button loginButton = findViewById(R.id.login_button);
 
         loginButton.setOnClickListener(v -> {
@@ -42,6 +50,8 @@ public class LoginActivity extends AppCompatActivity {
                 public void onResponse(@NonNull okhttp3.Call call, @NonNull okhttp3.Response response) throws IOException {
                     response.close();
                     if (response.isSuccessful()) {
+                        ServerApi.saveCredentials(LoginActivity.this, server, username, password);
+
                         runOnUiThread(() -> {
                             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                             startActivity(intent);
