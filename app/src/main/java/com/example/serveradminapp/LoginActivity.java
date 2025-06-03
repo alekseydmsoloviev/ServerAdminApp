@@ -29,7 +29,6 @@ public class LoginActivity extends AppCompatActivity {
 
         loginButton.setOnClickListener(v -> {
 
-
             String server = serverEdit.getText().toString().trim();
             String username = usernameEdit.getText().toString().trim();
             String password = passwordEdit.getText().toString().trim();
