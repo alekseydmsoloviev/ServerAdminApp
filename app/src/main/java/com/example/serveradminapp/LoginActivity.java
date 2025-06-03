@@ -8,7 +8,6 @@ import android.widget.EditText;
 import androidx.annotation.NonNull;
 import java.io.IOException;
 
-
 import androidx.appcompat.app.AppCompatActivity;
 
 public class LoginActivity extends AppCompatActivity {
@@ -27,7 +26,6 @@ public class LoginActivity extends AppCompatActivity {
         Button loginButton = findViewById(R.id.login_button);
 
         loginButton.setOnClickListener(v -> {
-
             String server = serverEdit.getText().toString().trim();
             String username = usernameEdit.getText().toString().trim();
             String password = passwordEdit.getText().toString().trim();

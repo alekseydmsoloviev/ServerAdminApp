@@ -2,11 +2,15 @@ package com.example.serveradminapp;
 
 import android.os.Bundle;
 import android.content.Intent;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.ImageButton;
 
 import java.util.ArrayList;
 
@@ -21,9 +25,8 @@ import java.io.IOException;
 public class ModelsActivity extends AppCompatActivity {
 
     private ArrayList<String> modelList = new ArrayList<>();
-    private ArrayAdapter<String> adapter;
+    private ModelAdapter adapter;
     private ListView listView;
-
     private Spinner availableSpinner;
     private Spinner variantSpinner;
     private ArrayAdapter<String> availableAdapter;
@@ -32,7 +35,6 @@ public class ModelsActivity extends AppCompatActivity {
     private ArrayList<String> variantList = new ArrayList<>();
     private TextView progressText;
     private okhttp3.WebSocket ws;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,11 +49,9 @@ public class ModelsActivity extends AppCompatActivity {
         availableSpinner = findViewById(R.id.available_spinner);
         variantSpinner = findViewById(R.id.variant_spinner);
         Button installButton = findViewById(R.id.install_model_button);
-
         progressText = findViewById(R.id.progress_text);
 
-
-        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, modelList);
+        adapter = new ModelAdapter();
         listView.setAdapter(adapter);
 
         availableAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, availableList);
@@ -73,10 +73,9 @@ public class ModelsActivity extends AppCompatActivity {
         loadAvailableModels();
         connectMetrics();
         installButton.setOnClickListener(v -> installSelected());
-
         listView.setOnItemLongClickListener((parent, view, position, id) -> {
             String model = modelList.get(position);
-            deleteModel(model);
+            confirmDelete(model);
             return true;
         });
     }
@@ -111,7 +110,6 @@ public class ModelsActivity extends AppCompatActivity {
         });
     }
 
-
     private void loadAvailableModels() {
 
         ServerApi.get().availableModels(new okhttp3.Callback() {
@@ -131,7 +129,6 @@ public class ModelsActivity extends AppCompatActivity {
                 response.close();
                 try {
                     JSONArray arr = new JSONArray(body);
-
                     availableList.clear();
                     for (int i = 0; i < arr.length(); i++) {
                         availableList.add(arr.getString(i));
@@ -167,7 +164,6 @@ public class ModelsActivity extends AppCompatActivity {
                         variantList.add(arr.getString(i));
                     }
                     runOnUiThread(() -> variantAdapter.notifyDataSetChanged());
-
                 } catch (JSONException ex) {
                     onFailure(call, new IOException(ex));
                 }
@@ -175,14 +171,12 @@ public class ModelsActivity extends AppCompatActivity {
         });
     }
 
-
     private void installSelected() {
         if (availableList.isEmpty() || variantList.isEmpty()) return;
         String model = (String) availableSpinner.getSelectedItem();
         String variant = (String) variantSpinner.getSelectedItem();
         String fullVariant = variant.contains(":" ) ? variant : model + ":" + variant;
-        ServerApi.get().installModel(model, fullVariant, new okhttp3.Callback() {
-
+        ServerApi.get().installModelVariant(fullVariant, new okhttp3.Callback() {
             @Override
             public void onFailure(@NonNull okhttp3.Call call, @NonNull IOException e) {
                 runOnUiThread(() -> android.widget.Toast.makeText(ModelsActivity.this, "Error", android.widget.Toast.LENGTH_SHORT).show());
@@ -205,6 +199,13 @@ public class ModelsActivity extends AppCompatActivity {
                     if ("progress".equals(obj.optString("type"))) {
                         String data = obj.optString("data");
                         runOnUiThread(() -> progressText.setText(data));
+                    } else if (obj.has("models")) {
+                        org.json.JSONArray arr = obj.getJSONArray("models");
+                        modelList.clear();
+                        for (int i = 0; i < arr.length(); i++) {
+                            modelList.add(arr.getString(i));
+                        }
+                        runOnUiThread(() -> adapter.notifyDataSetChanged());
                     }
                 } catch (org.json.JSONException ignored) {
                 }
@@ -217,7 +218,6 @@ public class ModelsActivity extends AppCompatActivity {
         if (ws != null) ws.close(1000, null);
         super.onDestroy();
     }
-
 
     private void deleteModel(String name) {
         ServerApi.get().deleteModel(name, new okhttp3.Callback() {
@@ -232,5 +232,32 @@ public class ModelsActivity extends AppCompatActivity {
                 loadModels();
             }
         });
+    }
+
+    private class ModelAdapter extends ArrayAdapter<String> {
+        ModelAdapter() {
+            super(ModelsActivity.this, 0, modelList);
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            if (convertView == null) {
+                convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_model, parent, false);
+            }
+            String name = getItem(position);
+            TextView tv = convertView.findViewById(R.id.model_name);
+            tv.setText(name);
+            ImageButton del = convertView.findViewById(R.id.delete_button);
+            del.setOnClickListener(v -> confirmDelete(name));
+            return convertView;
+        }
+    }
+
+    private void confirmDelete(String name) {
+        new android.app.AlertDialog.Builder(this)
+                .setMessage("Delete " + name + "?")
+                .setPositiveButton("Delete", (d, w) -> deleteModel(name))
+                .setNegativeButton("Cancel", null)
+                .show();
     }
 }

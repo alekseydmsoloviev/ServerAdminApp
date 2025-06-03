@@ -13,7 +13,6 @@ import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
 import okhttp3.Callback;
 
-
 import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
@@ -25,13 +24,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         if (ServerApi.get() == null) {
             startActivity(new Intent(this, LoginActivity.class));
             finish();
             return;
         }
-
         setContentView(R.layout.activity_main);
 
         uptimeText = findViewById(R.id.uptime_text);
@@ -48,7 +45,6 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(MainActivity.this, ModelsActivity.class)));
         settingsButton.setOnClickListener(v ->
                 startActivity(new Intent(MainActivity.this, SettingsActivity.class)));
-
 
         connectMetrics();
         loadStatus();

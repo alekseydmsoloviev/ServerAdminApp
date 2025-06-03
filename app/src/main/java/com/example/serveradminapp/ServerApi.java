@@ -17,7 +17,6 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.MediaType;
-
 import okhttp3.Response;
 import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
@@ -97,17 +96,22 @@ public class ServerApi {
     }
 
     public void installModel(@NonNull String name, @NonNull Callback callback) {
-        Request request = baseRequest("/admin/api/models/" + name + "/install").post(RequestBody.create(new byte[0])).build();
+
+        Request request = baseRequest("/admin/api/models/" + name + "/install")
+                .post(RequestBody.create(new byte[0]))
+                .build();
         client.newCall(request).enqueue(callback);
     }
 
-    public void installModel(@NonNull String name, @NonNull String variant, @NonNull Callback callback) {
-        JSONObject obj = new JSONObject();
-        try {
-            obj.put("variant", variant);
-        } catch (JSONException ignored) {}
-        RequestBody body = RequestBody.create(obj.toString(), MediaType.get("application/json"));
-        Request request = baseRequest("/admin/api/models/" + name + "/install").post(body).build();
+    /**
+     * Install a specific model variant by placing the full variant name in the
+     * URL path as required by the server.
+     */
+    public void installModelVariant(@NonNull String variant, @NonNull Callback callback) {
+        String encoded = java.net.URLEncoder.encode(variant, java.nio.charset.StandardCharsets.UTF_8);
+        Request request = baseRequest("/admin/api/models/" + encoded + "/install")
+                .post(RequestBody.create(new byte[0]))
+                .build();
         client.newCall(request).enqueue(callback);
     }
 
