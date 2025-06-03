@@ -31,6 +31,7 @@ public class UsersActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ServerApi.restore(this);
+
         if (ServerApi.get() == null) {
             startActivity(new Intent(this, LoginActivity.class));
             finish();

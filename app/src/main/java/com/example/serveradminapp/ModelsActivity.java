@@ -11,6 +11,7 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.ImageButton;
+
 import java.util.ArrayList;
 
 import androidx.annotation.NonNull;
@@ -39,6 +40,7 @@ public class ModelsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ServerApi.restore(this);
+
         if (ServerApi.get() == null) {
             startActivity(new Intent(this, LoginActivity.class));
             finish();
@@ -111,6 +113,7 @@ public class ModelsActivity extends AppCompatActivity {
     }
 
     private void loadAvailableModels() {
+
         ServerApi.get().availableModels(new okhttp3.Callback() {
             @Override
             public void onFailure(@NonNull okhttp3.Call call, @NonNull IOException e) {
