@@ -1,8 +1,7 @@
 package com.example.serveradminapp;
 
-
+import android.os.Bundle;
 import android.content.Intent;
-
 import android.widget.Button;
 import android.widget.EditText;
 
@@ -16,20 +15,17 @@ import java.io.IOException;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 
-
 public class SettingsActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         if (ServerApi.get() == null) {
             startActivity(new Intent(this, LoginActivity.class));
             finish();
             return;
         }
         setContentView(R.layout.activity_settings);
-
         EditText portEdit = findViewById(R.id.port_edit);
         EditText limitEdit = findViewById(R.id.limit_edit);
         Button saveButton = findViewById(R.id.save_button);
@@ -107,6 +103,5 @@ public class SettingsActivity extends AppCompatActivity {
                 runOnUiThread(() -> android.widget.Toast.makeText(SettingsActivity.this, "Restarting", android.widget.Toast.LENGTH_SHORT).show());
             }
         });
-
     }
 }

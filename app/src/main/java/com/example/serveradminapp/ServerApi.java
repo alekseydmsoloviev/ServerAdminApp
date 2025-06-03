@@ -16,7 +16,6 @@ import okhttp3.Callback;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
-
 import okhttp3.MediaType;
 
 import okhttp3.Response;
@@ -34,7 +33,6 @@ public class ServerApi {
     private final OkHttpClient client = new OkHttpClient();
 
     private ServerApi(String baseUrl, String username, String password) {
-
         String url = baseUrl;
         if (!url.startsWith("http")) {
             url = "http://" + url;
@@ -45,7 +43,6 @@ public class ServerApi {
         url = url.replace("://localhost", "://10.0.2.2")
                    .replace("://127.0.0.1", "://10.0.2.2");
         this.baseUrl = url;
-
         String creds = username + ":" + password;
         this.authHeader = "Basic " + Base64.encodeToString(creds.getBytes(StandardCharsets.UTF_8), Base64.NO_WRAP);
     }
@@ -94,12 +91,10 @@ public class ServerApi {
         client.newCall(request).enqueue(callback);
     }
 
-
     public void modelVariants(@NonNull String name, @NonNull Callback callback) {
         Request request = baseRequest("/admin/api/models/" + name + "/variants").get().build();
         client.newCall(request).enqueue(callback);
     }
-
 
     public void installModel(@NonNull String name, @NonNull Callback callback) {
         Request request = baseRequest("/admin/api/models/" + name + "/install").post(RequestBody.create(new byte[0])).build();
@@ -115,7 +110,6 @@ public class ServerApi {
         Request request = baseRequest("/admin/api/models/" + name + "/install").post(body).build();
         client.newCall(request).enqueue(callback);
     }
-
 
     public void deleteModel(@NonNull String name, @NonNull Callback callback) {
         Request request = baseRequest("/admin/api/models/" + name).delete().build();
@@ -164,5 +158,4 @@ public class ServerApi {
         }
         return result;
     }
-
 }

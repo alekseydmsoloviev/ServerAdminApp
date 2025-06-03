@@ -1,12 +1,12 @@
 package com.example.serveradminapp;
 
 import android.os.Bundle;
-
 import android.content.Intent;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 
@@ -30,12 +30,13 @@ public class ModelsActivity extends AppCompatActivity {
     private ArrayAdapter<String> variantAdapter;
     private ArrayList<String> availableList = new ArrayList<>();
     private ArrayList<String> variantList = new ArrayList<>();
+    private TextView progressText;
+    private okhttp3.WebSocket ws;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         if (ServerApi.get() == null) {
             startActivity(new Intent(this, LoginActivity.class));
             finish();
@@ -46,6 +47,9 @@ public class ModelsActivity extends AppCompatActivity {
         availableSpinner = findViewById(R.id.available_spinner);
         variantSpinner = findViewById(R.id.variant_spinner);
         Button installButton = findViewById(R.id.install_model_button);
+
+        progressText = findViewById(R.id.progress_text);
+
 
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, modelList);
         listView.setAdapter(adapter);
@@ -67,6 +71,7 @@ public class ModelsActivity extends AppCompatActivity {
 
         loadModels();
         loadAvailableModels();
+        connectMetrics();
         installButton.setOnClickListener(v -> installSelected());
 
         listView.setOnItemLongClickListener((parent, view, position, id) -> {
@@ -175,7 +180,8 @@ public class ModelsActivity extends AppCompatActivity {
         if (availableList.isEmpty() || variantList.isEmpty()) return;
         String model = (String) availableSpinner.getSelectedItem();
         String variant = (String) variantSpinner.getSelectedItem();
-        ServerApi.get().installModel(model, variant, new okhttp3.Callback() {
+        String fullVariant = variant.contains(":" ) ? variant : model + ":" + variant;
+        ServerApi.get().installModel(model, fullVariant, new okhttp3.Callback() {
 
             @Override
             public void onFailure(@NonNull okhttp3.Call call, @NonNull IOException e) {
@@ -185,12 +191,33 @@ public class ModelsActivity extends AppCompatActivity {
             @Override
             public void onResponse(@NonNull okhttp3.Call call, @NonNull okhttp3.Response response) throws IOException {
                 response.close();
-
                 loadModels();
-
             }
         });
     }
+
+    private void connectMetrics() {
+        ws = ServerApi.get().connectMetrics(new okhttp3.WebSocketListener() {
+            @Override
+            public void onMessage(@NonNull okhttp3.WebSocket webSocket, @NonNull String text) {
+                try {
+                    org.json.JSONObject obj = new org.json.JSONObject(text);
+                    if ("progress".equals(obj.optString("type"))) {
+                        String data = obj.optString("data");
+                        runOnUiThread(() -> progressText.setText(data));
+                    }
+                } catch (org.json.JSONException ignored) {
+                }
+            }
+        });
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (ws != null) ws.close(1000, null);
+        super.onDestroy();
+    }
+
 
     private void deleteModel(String name) {
         ServerApi.get().deleteModel(name, new okhttp3.Callback() {
@@ -205,6 +232,5 @@ public class ModelsActivity extends AppCompatActivity {
                 loadModels();
             }
         });
-
     }
 }

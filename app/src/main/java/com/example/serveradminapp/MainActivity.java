@@ -116,6 +116,5 @@ public class MainActivity extends AppCompatActivity {
                 } catch (JSONException ignored) {}
             }
         });
-
     }
 }
