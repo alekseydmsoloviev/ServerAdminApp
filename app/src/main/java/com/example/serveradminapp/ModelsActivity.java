@@ -2,10 +2,12 @@ package com.example.serveradminapp;
 
 import android.os.Bundle;
 
-import android.app.AlertDialog;
+import android.content.Intent;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Spinner;
+
 import java.util.ArrayList;
 
 import androidx.annotation.NonNull;
@@ -22,18 +24,51 @@ public class ModelsActivity extends AppCompatActivity {
     private ArrayAdapter<String> adapter;
     private ListView listView;
 
+    private Spinner availableSpinner;
+    private Spinner variantSpinner;
+    private ArrayAdapter<String> availableAdapter;
+    private ArrayAdapter<String> variantAdapter;
+    private ArrayList<String> availableList = new ArrayList<>();
+    private ArrayList<String> variantList = new ArrayList<>();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_models);
 
+        if (ServerApi.get() == null) {
+            startActivity(new Intent(this, LoginActivity.class));
+            finish();
+            return;
+        }
+        setContentView(R.layout.activity_models);
         listView = findViewById(R.id.models_list);
+        availableSpinner = findViewById(R.id.available_spinner);
+        variantSpinner = findViewById(R.id.variant_spinner);
         Button installButton = findViewById(R.id.install_model_button);
+
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, modelList);
         listView.setAdapter(adapter);
+
+        availableAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, availableList);
+        availableAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        availableSpinner.setAdapter(availableAdapter);
+        availableSpinner.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
+            @Override public void onItemSelected(android.widget.AdapterView<?> parent, android.view.View view, int position, long id) {
+                String name = availableList.get(position);
+                loadVariants(name);
+            }
+            @Override public void onNothingSelected(android.widget.AdapterView<?> parent) {}
+        });
+
+        variantAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, variantList);
+        variantAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        variantSpinner.setAdapter(variantAdapter);
+
         loadModels();
-        installButton.setOnClickListener(v -> showInstallDialog());
+        loadAvailableModels();
+        installButton.setOnClickListener(v -> installSelected());
+
         listView.setOnItemLongClickListener((parent, view, position, id) -> {
             String model = modelList.get(position);
             deleteModel(model);
@@ -71,7 +106,9 @@ public class ModelsActivity extends AppCompatActivity {
         });
     }
 
-    private void showInstallDialog() {
+
+    private void loadAvailableModels() {
+
         ServerApi.get().availableModels(new okhttp3.Callback() {
             @Override
             public void onFailure(@NonNull okhttp3.Call call, @NonNull IOException e) {
@@ -89,13 +126,12 @@ public class ModelsActivity extends AppCompatActivity {
                 response.close();
                 try {
                     JSONArray arr = new JSONArray(body);
-                    String[] items = ServerApi.jsonArrayToStringArray(arr);
-                    runOnUiThread(() -> {
-                        AlertDialog.Builder b = new AlertDialog.Builder(ModelsActivity.this);
-                        b.setTitle("Install model");
-                        b.setItems(items, (d, which) -> installModel(items[which]));
-                        b.show();
-                    });
+
+                    availableList.clear();
+                    for (int i = 0; i < arr.length(); i++) {
+                        availableList.add(arr.getString(i));
+                    }
+                    runOnUiThread(() -> availableAdapter.notifyDataSetChanged());
                 } catch (JSONException ex) {
                     onFailure(call, new IOException(ex));
                 }
@@ -103,8 +139,44 @@ public class ModelsActivity extends AppCompatActivity {
         });
     }
 
-    private void installModel(String name) {
-        ServerApi.get().installModel(name, new okhttp3.Callback() {
+    private void loadVariants(String name) {
+        ServerApi.get().modelVariants(name, new okhttp3.Callback() {
+            @Override
+            public void onFailure(@NonNull okhttp3.Call call, @NonNull IOException e) {
+                runOnUiThread(() -> android.widget.Toast.makeText(ModelsActivity.this, "Failed", android.widget.Toast.LENGTH_SHORT).show());
+            }
+
+            @Override
+            public void onResponse(@NonNull okhttp3.Call call, @NonNull okhttp3.Response response) throws IOException {
+                if (!response.isSuccessful()) {
+                    response.close();
+                    onFailure(call, new IOException("HTTP " + response.code()));
+                    return;
+                }
+                String body = response.body().string();
+                response.close();
+                try {
+                    JSONArray arr = new JSONArray(body);
+                    variantList.clear();
+                    for (int i = 0; i < arr.length(); i++) {
+                        variantList.add(arr.getString(i));
+                    }
+                    runOnUiThread(() -> variantAdapter.notifyDataSetChanged());
+
+                } catch (JSONException ex) {
+                    onFailure(call, new IOException(ex));
+                }
+            }
+        });
+    }
+
+
+    private void installSelected() {
+        if (availableList.isEmpty() || variantList.isEmpty()) return;
+        String model = (String) availableSpinner.getSelectedItem();
+        String variant = (String) variantSpinner.getSelectedItem();
+        ServerApi.get().installModel(model, variant, new okhttp3.Callback() {
+
             @Override
             public void onFailure(@NonNull okhttp3.Call call, @NonNull IOException e) {
                 runOnUiThread(() -> android.widget.Toast.makeText(ModelsActivity.this, "Error", android.widget.Toast.LENGTH_SHORT).show());
@@ -113,6 +185,9 @@ public class ModelsActivity extends AppCompatActivity {
             @Override
             public void onResponse(@NonNull okhttp3.Call call, @NonNull okhttp3.Response response) throws IOException {
                 response.close();
+
+                loadModels();
+
             }
         });
     }

@@ -1,6 +1,7 @@
 package com.example.serveradminapp;
 
-import android.os.Bundle;
+
+import android.content.Intent;
 
 import android.widget.Button;
 import android.widget.EditText;
@@ -21,6 +22,13 @@ public class SettingsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (ServerApi.get() == null) {
+            startActivity(new Intent(this, LoginActivity.class));
+            finish();
+            return;
+        }
+        setContentView(R.layout.activity_settings);
 
         EditText portEdit = findViewById(R.id.port_edit);
         EditText limitEdit = findViewById(R.id.limit_edit);

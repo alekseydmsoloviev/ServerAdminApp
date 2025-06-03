@@ -3,6 +3,8 @@ package com.example.serveradminapp;
 import android.os.Bundle;
 
 import android.app.AlertDialog;
+import android.content.Intent;
+
 import android.text.InputType;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -32,6 +34,11 @@ public class UsersActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (ServerApi.get() == null) {
+            startActivity(new Intent(this, LoginActivity.class));
+            finish();
+            return;
+        }
         setContentView(R.layout.activity_users);
 
         listView = findViewById(R.id.users_list);
