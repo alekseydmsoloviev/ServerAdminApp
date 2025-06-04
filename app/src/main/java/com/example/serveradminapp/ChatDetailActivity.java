@@ -39,6 +39,7 @@ public class ChatDetailActivity extends AppCompatActivity {
 
         TextView messagesView = findViewById(R.id.messages_text);
         messagesView.setText(R.string.loading);
+
         Button refreshButton = findViewById(R.id.refresh_button);
         refreshButton.setOnClickListener(v -> loadMessages(sessionId, messagesView));
 
@@ -54,11 +55,13 @@ public class ChatDetailActivity extends AppCompatActivity {
 
             @Override
             public void onResponse(@NonNull okhttp3.Call call, @NonNull okhttp3.Response response) throws IOException {
+
                 if (!response.isSuccessful()) {
                     response.close();
                     runOnUiThread(() -> view.setText("Error " + response.code()));
                     return;
                 }
+
                 String body = response.body().string();
                 response.close();
                 try {
