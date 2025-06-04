@@ -155,6 +155,7 @@ public class MainActivity extends AppCompatActivity {
                     if (weekCount == 0) weekCount = extractSum(obj); // fallback
 
                     final int[] weekBarsValues = weekArray;
+
                     final int count24h = dayCount;
                     final int count7d = weekCount;
                     runOnUiThread(() -> {
