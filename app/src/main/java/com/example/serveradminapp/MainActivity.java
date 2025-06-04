@@ -6,6 +6,9 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.view.Gravity;
+import android.util.TypedValue;
 
 import androidx.annotation.NonNull;
 import org.json.JSONException;
@@ -24,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView resourceText;
     private TextView messages24hText;
     private TextView messagesTotalText;
+    private LinearLayout userChart;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,20 +44,30 @@ public class MainActivity extends AppCompatActivity {
         resourceText = findViewById(R.id.resource_text);
         messages24hText = findViewById(R.id.messages_24h_text);
         messagesTotalText = findViewById(R.id.messages_total_text);
+        userChart = findViewById(R.id.user_chart);
 
         Button usersButton = findViewById(R.id.users_button);
         Button modelsButton = findViewById(R.id.models_button);
+        Button chatsButton = findViewById(R.id.chats_button);
         Button settingsButton = findViewById(R.id.settings_button);
 
         usersButton.setOnClickListener(v ->
                 startActivity(new Intent(MainActivity.this, UsersActivity.class)));
         modelsButton.setOnClickListener(v ->
                 startActivity(new Intent(MainActivity.this, ModelsActivity.class)));
+        chatsButton.setOnClickListener(v ->
+                startActivity(new Intent(MainActivity.this, ChatsActivity.class)));
         settingsButton.setOnClickListener(v ->
                 startActivity(new Intent(MainActivity.this, SettingsActivity.class)));
 
         connectMetrics();
         loadStatus();
+        loadUsage();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
         loadUsage();
     }
 
@@ -139,11 +153,63 @@ public class MainActivity extends AppCompatActivity {
         int dayCount = obj.optInt("day_total", obj.optInt("day"));
         int totalCount = obj.optInt("total", dayCount);
 
+        java.util.LinkedHashMap<String, Integer> counts = new java.util.LinkedHashMap<>();
+        int max = 0;
+
+        JSONObject usersObj = obj.optJSONObject("users");
+        if (usersObj != null) {
+            java.util.Iterator<String> it = usersObj.keys();
+            while (it.hasNext()) {
+                String key = it.next();
+                int val = usersObj.optInt(key);
+                counts.put(key, val);
+                if (val > max) max = val;
+            }
+        } else {
+            java.util.Iterator<String> it = obj.keys();
+            while (it.hasNext()) {
+                String key = it.next();
+                if ("day_total".equals(key) || "day".equals(key) || "total".equals(key)) continue;
+                int val = obj.optInt(key);
+                counts.put(key, val);
+                if (val > max) max = val;
+            }
+        }
+
         final int count24h = dayCount;
         final int countTotal = totalCount;
+        final java.util.LinkedHashMap<String,Integer> finalCounts = counts;
+        final int maxCount = max;
         runOnUiThread(() -> {
             messages24hText.setText("Messages last 24h: " + count24h);
             messagesTotalText.setText("Messages total: " + countTotal);
+
+            userChart.removeAllViews();
+            float maxBarHeight = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 80, getResources().getDisplayMetrics());
+            for (java.util.Map.Entry<String,Integer> e : finalCounts.entrySet()) {
+                LinearLayout col = new LinearLayout(MainActivity.this);
+                col.setOrientation(LinearLayout.VERTICAL);
+                col.setGravity(Gravity.BOTTOM);
+                col.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1f));
+
+                TextView top = new TextView(MainActivity.this);
+                top.setGravity(Gravity.CENTER_HORIZONTAL);
+                top.setText(String.valueOf(e.getValue()));
+
+                View bar = new View(MainActivity.this);
+                int h = maxCount == 0 ? 0 : (int)(maxBarHeight * e.getValue() / maxCount);
+                bar.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, h));
+                bar.setBackgroundColor(getResources().getColor(android.R.color.holo_blue_light));
+
+                TextView name = new TextView(MainActivity.this);
+                name.setGravity(Gravity.CENTER_HORIZONTAL);
+                name.setText(e.getKey());
+
+                col.addView(top);
+                col.addView(bar);
+                col.addView(name);
+                userChart.addView(col);
+            }
         });
     }
 }
