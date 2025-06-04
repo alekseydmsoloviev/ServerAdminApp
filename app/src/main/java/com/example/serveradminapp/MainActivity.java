@@ -72,12 +72,14 @@ public class MainActivity extends AppCompatActivity {
                     if (obj.has("cpu")) {
                         final String uptime = obj.optString("cpu") + "% CPU, " + obj.optString("memory") + "% MEM";
                         runOnUiThread(() -> uptimeText.setText(uptime));
+
                     } else if (obj.has("snapshot")) {
                         // new API sends an overview snapshot that may contain usage statistics
                         JSONObject snap = obj.getJSONObject("snapshot");
                         if (snap.has("usage")) {
                             updateUsageFromJson(snap);
                         }
+
                     } else if ("progress".equals(obj.optString("type"))) {
                         // ignore progress for now
                     }
