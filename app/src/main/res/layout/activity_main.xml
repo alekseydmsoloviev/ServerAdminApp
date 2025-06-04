@@ -10,6 +10,7 @@
         android:padding="16dp">
 
         <TextView
+
             android:id="@+id/metrics_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -21,6 +22,7 @@
             android:layout_height="wrap_content"
             android:text="NET: --  DISK: --" />
 
+
         <TextView
             android:id="@+id/messages_24h_text"
             android:layout_width="wrap_content"
@@ -28,10 +30,12 @@
             android:text="Messages last 24h: --" />
 
         <TextView
+
             android:id="@+id/messages_total_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Messages total:" />
+
 
         <LinearLayout
             android:id="@+id/week_chart"
