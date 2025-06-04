@@ -155,13 +155,25 @@ public class MainActivity extends AppCompatActivity {
 
         java.util.LinkedHashMap<String, Integer> counts = new java.util.LinkedHashMap<>();
         int max = 0;
-        java.util.Iterator<String> it = obj.keys();
-        while (it.hasNext()) {
-            String key = it.next();
-            if ("day_total".equals(key) || "day".equals(key) || "total".equals(key)) continue;
-            int val = obj.optInt(key);
-            counts.put(key, val);
-            if (val > max) max = val;
+
+        JSONObject usersObj = obj.optJSONObject("users");
+        if (usersObj != null) {
+            java.util.Iterator<String> it = usersObj.keys();
+            while (it.hasNext()) {
+                String key = it.next();
+                int val = usersObj.optInt(key);
+                counts.put(key, val);
+                if (val > max) max = val;
+            }
+        } else {
+            java.util.Iterator<String> it = obj.keys();
+            while (it.hasNext()) {
+                String key = it.next();
+                if ("day_total".equals(key) || "day".equals(key) || "total".equals(key)) continue;
+                int val = obj.optInt(key);
+                counts.put(key, val);
+                if (val > max) max = val;
+            }
         }
 
         final int count24h = dayCount;

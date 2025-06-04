@@ -55,7 +55,13 @@ public class ChatDetailActivity extends AppCompatActivity {
 
             @Override
             public void onResponse(@NonNull okhttp3.Call call, @NonNull okhttp3.Response response) throws IOException {
-                if (!response.isSuccessful()) { response.close(); return; }
+
+                if (!response.isSuccessful()) {
+                    response.close();
+                    runOnUiThread(() -> view.setText("Error " + response.code()));
+                    return;
+                }
+
                 String body = response.body().string();
                 response.close();
                 try {
@@ -64,10 +70,9 @@ public class ChatDetailActivity extends AppCompatActivity {
                     JSONArray arr = obj.optJSONArray("messages");
                     StringBuilder sb = new StringBuilder();
                     if (arr != null) {
-                        for (int i=0;i<arr.length();i++) {
+                        for (int i = 0; i < arr.length(); i++) {
                             JSONObject m = arr.getJSONObject(i);
-                            sb.append("<p><b")
-                              .append(">")
+                            sb.append("<p><b>")
                               .append(TextUtils.htmlEncode(m.optString("username")))
                               .append(" (")
                               .append(TextUtils.htmlEncode(m.optString("role")))
