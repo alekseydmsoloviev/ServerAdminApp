@@ -48,6 +48,7 @@ public class ChatsActivity extends AppCompatActivity {
         Spinner sortSpinner = findViewById(R.id.sort_spinner);
         View refreshButton = findViewById(R.id.refresh_button);
 
+
         adapter = new ChatAdapter();
         listView.setAdapter(adapter);
 
@@ -69,6 +70,7 @@ public class ChatsActivity extends AppCompatActivity {
             }
             @Override public void onNothingSelected(AdapterView<?> parent) {}
         });
+
 
         refreshButton.setOnClickListener(v -> loadChats());
 
@@ -146,6 +148,7 @@ public class ChatsActivity extends AppCompatActivity {
                 title = obj.optString("session_id");
             }
             sid.setText(title);
+
             user.setText(obj.optString("username"));
             created.setText(obj.optString("created_at"));
             return convertView;

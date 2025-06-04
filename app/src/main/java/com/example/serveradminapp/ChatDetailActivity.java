@@ -7,6 +7,7 @@ import android.widget.Button;
 import android.text.TextUtils;
 import androidx.core.text.HtmlCompat;
 
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -20,6 +21,7 @@ public class ChatDetailActivity extends AppCompatActivity {
 
     private String sessionId;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,6 +34,7 @@ public class ChatDetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_chat_detail);
 
         sessionId = getIntent().getStringExtra("session_id");
+
         if (sessionId == null) {
             finish();
             return;
@@ -58,12 +61,15 @@ public class ChatDetailActivity extends AppCompatActivity {
                 response.close();
                 try {
                     JSONObject obj = new JSONObject(body);
+
                     setTitle(obj.optString("title", obj.optString("session_id")));
+
                     JSONArray arr = obj.optJSONArray("messages");
                     StringBuilder sb = new StringBuilder();
                     if (arr != null) {
                         for (int i=0;i<arr.length();i++) {
                             JSONObject m = arr.getJSONObject(i);
+
                             sb.append("<p><b")
                               .append(">")
                               .append(TextUtils.htmlEncode(m.optString("username")))
@@ -75,6 +81,7 @@ public class ChatDetailActivity extends AppCompatActivity {
                         }
                     }
                     final CharSequence text = HtmlCompat.fromHtml(sb.toString(), HtmlCompat.FROM_HTML_MODE_LEGACY);
+
                     runOnUiThread(() -> view.setText(text));
                 } catch (JSONException ex) {
                     runOnUiThread(() -> view.setText("Error"));
