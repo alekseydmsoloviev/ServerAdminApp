@@ -64,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     JSONObject obj = new JSONObject(text);
                     if (obj.has("cpu")) {
+
                         final String metrics = "CPU: " + obj.optString("cpu") + "%  MEM: " + obj.optString("memory") + "%";
                         final String res = "NET: " + obj.optString("network") + "%  DISK: " + obj.optString("disk") + "%";
                         final int day = obj.optInt("day_total");
@@ -76,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
                         });
                     } else if (obj.has("snapshot")) {
                         // overview snapshot may include usage data
+
                         JSONObject snap = obj.getJSONObject("snapshot");
                         updateUsageFromJson(snap);
                     } else if ("progress".equals(obj.optString("type"))) {
@@ -102,6 +104,7 @@ public class MainActivity extends AppCompatActivity {
                     JSONObject obj = new JSONObject(body);
                     final String status = "Port " + obj.optString("port") + ", sessions: " + obj.optString("sessions");
                     runOnUiThread(() -> metricsText.setText(status));
+
                 } catch (JSONException ignored) {}
             }
         });
@@ -114,6 +117,7 @@ public class MainActivity extends AppCompatActivity {
                 runOnUiThread(() -> {
                     messages24hText.setText("Messages last 24h: --");
                     messagesTotalText.setText("Messages total: --");
+
                 });
             }
 
@@ -142,5 +146,4 @@ public class MainActivity extends AppCompatActivity {
             messagesTotalText.setText("Messages total: " + countTotal);
         });
     }
-
 }
