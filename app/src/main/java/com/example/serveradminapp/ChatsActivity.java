@@ -86,7 +86,10 @@ public class ChatsActivity extends AppCompatActivity {
         ServerApi.get().listSessions(new okhttp3.Callback() {
             @Override
             public void onFailure(@NonNull okhttp3.Call call, @NonNull IOException e) {
-                runOnUiThread(() -> chatList.clear());
+                runOnUiThread(() -> {
+                    chatList.clear();
+                    adapter.notifyDataSetChanged();
+                });
             }
 
             @Override
@@ -106,6 +109,12 @@ public class ChatsActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        loadChats();
     }
 
     private void sortAndUpdate() {

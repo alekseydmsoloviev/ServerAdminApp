@@ -65,6 +65,12 @@ public class MainActivity extends AppCompatActivity {
         loadUsage();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        loadUsage();
+    }
+
     private void connectMetrics() {
         ServerApi.get().connectMetrics(new WebSocketListener() {
             @Override

@@ -3,7 +3,10 @@
     android:orientation="horizontal"
     android:padding="8dp"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:clickable="true"
+    android:background="?attr/selectableItemBackground"
+    android:descendantFocusability="blocksDescendants">
 
     <LinearLayout
         android:layout_width="0dp"
