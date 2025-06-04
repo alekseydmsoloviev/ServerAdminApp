@@ -190,7 +190,19 @@ public class MainActivity extends AppCompatActivity {
                 LinearLayout col = new LinearLayout(MainActivity.this);
                 col.setOrientation(LinearLayout.VERTICAL);
                 col.setGravity(Gravity.BOTTOM);
-                col.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1f));
+                int colWidth = (int) TypedValue.applyDimension(
+                        TypedValue.COMPLEX_UNIT_DIP, 40,
+                        getResources().getDisplayMetrics());
+                LinearLayout.LayoutParams colParams =
+                        new LinearLayout.LayoutParams(colWidth, ViewGroup.LayoutParams.MATCH_PARENT);
+                colParams.setMargins(
+                        (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4,
+                                getResources().getDisplayMetrics()),
+                        0,
+                        (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4,
+                                getResources().getDisplayMetrics()),
+                        0);
+                col.setLayoutParams(colParams);
 
                 TextView top = new TextView(MainActivity.this);
                 top.setGravity(Gravity.CENTER_HORIZONTAL);
