@@ -25,7 +25,6 @@ public class MainActivity extends AppCompatActivity {
     private TextView messages7dText;
     private View[] weekBars = new View[7];
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,7 +39,6 @@ public class MainActivity extends AppCompatActivity {
         uptimeText = findViewById(R.id.uptime_text);
         messages24hText = findViewById(R.id.messages_24h_text);
         messages7dText = findViewById(R.id.messages_7d_text);
-
         weekBars[0] = findViewById(R.id.bar1);
         weekBars[1] = findViewById(R.id.bar2);
         weekBars[2] = findViewById(R.id.bar3);
@@ -48,7 +46,6 @@ public class MainActivity extends AppCompatActivity {
         weekBars[4] = findViewById(R.id.bar5);
         weekBars[5] = findViewById(R.id.bar6);
         weekBars[6] = findViewById(R.id.bar7);
-
 
         Button usersButton = findViewById(R.id.users_button);
         Button modelsButton = findViewById(R.id.models_button);
@@ -108,12 +105,10 @@ public class MainActivity extends AppCompatActivity {
         ServerApi.get().fetchUsage(new Callback() {
             @Override
             public void onFailure(@NonNull okhttp3.Call call, @NonNull IOException e) {
-
                 runOnUiThread(() -> {
                     messages24hText.setText("Messages last 24h: --");
                     messages7dText.setText("Messages last 7 days: --");
                 });
-
             }
 
             @Override
@@ -124,17 +119,39 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     JSONObject obj = new JSONObject(body);
 
+                    int dayCount = 0;
+                    int[] weekArray = new int[0];
 
-                    int dayCount = extractSum(obj.opt("day"));
-                    int[] weekArray = extractArray(obj.opt("week"));
+                    if (obj.has("usage")) {
+                        JSONArray usage = obj.getJSONArray("usage");
+                        java.util.List<Integer> weekList = new java.util.ArrayList<>();
+                        for (int i = 0; i < usage.length(); i++) {
+                            JSONObject u = usage.getJSONObject(i);
+                            dayCount += u.optInt("day");
+                            JSONArray week = u.optJSONArray("week");
+                            if (week != null) {
+                                for (int j = 0; j < week.length(); j++) {
+                                    int val = week.optInt(j);
+                                    if (weekList.size() <= j) {
+                                        weekList.add(val);
+                                    } else {
+                                        weekList.set(j, weekList.get(j) + val);
+                                    }
+                                }
+                            }
+                        }
+                        weekArray = new int[weekList.size()];
+                        for (int i = 0; i < weekList.size(); i++) weekArray[i] = weekList.get(i);
+                    } else {
+                        dayCount = extractSum(obj.opt("day"));
+                        weekArray = extractArray(obj.opt("week"));
+                        if (dayCount == 0) dayCount = extractSum(obj.opt("last24h"));
+                        if (weekArray.length == 0) weekArray = extractArray(obj.opt("last7d"));
+                        if (weekArray.length == 0) weekArray = extractArray(obj.opt("week_usage"));
+                    }
+
                     int weekCount = 0;
                     for (int w : weekArray) weekCount += w;
-
-                    if (dayCount == 0) dayCount = extractSum(obj.opt("last24h"));
-                    if (weekArray.length == 0) {
-                        weekArray = extractArray(obj.opt("last7d"));
-                        for (int w : weekArray) weekCount += w;
-                    }
                     if (weekCount == 0) weekCount = extractSum(obj); // fallback
 
                     final int[] weekBarsValues = weekArray;
@@ -144,9 +161,7 @@ public class MainActivity extends AppCompatActivity {
                     runOnUiThread(() -> {
                         messages24hText.setText("Messages last 24h: " + count24h);
                         messages7dText.setText("Messages last 7 days: " + count7d);
-
                         updateWeekChart(weekBarsValues);
-
                     });
                 } catch (JSONException ignored) {}
             }
