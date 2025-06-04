@@ -46,6 +46,8 @@ public class ChatsActivity extends AppCompatActivity {
 
         ListView listView = findViewById(R.id.chats_list);
         Spinner sortSpinner = findViewById(R.id.sort_spinner);
+        View refreshButton = findViewById(R.id.refresh_button);
+
 
         adapter = new ChatAdapter();
         listView.setAdapter(adapter);
@@ -68,6 +70,9 @@ public class ChatsActivity extends AppCompatActivity {
             }
             @Override public void onNothingSelected(AdapterView<?> parent) {}
         });
+
+
+        refreshButton.setOnClickListener(v -> loadChats());
 
         listView.setOnItemClickListener((p,v,pos,id)->{
             JSONObject obj = chatList.get(pos);
@@ -135,10 +140,15 @@ public class ChatsActivity extends AppCompatActivity {
                 convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_chat, parent, false);
             }
             JSONObject obj = getItem(position);
-            TextView sid = convertView.findViewById(R.id.chat_session_id);
+            TextView sid = convertView.findViewById(R.id.chat_title);
             TextView user = convertView.findViewById(R.id.chat_username);
             TextView created = convertView.findViewById(R.id.chat_created);
-            sid.setText(obj.optString("session_id"));
+            String title = obj.optString("title");
+            if (title == null || title.isEmpty() || "null".equals(title)) {
+                title = obj.optString("session_id");
+            }
+            sid.setText(title);
+
             user.setText(obj.optString("username"));
             created.setText(obj.optString("created_at"));
             return convertView;

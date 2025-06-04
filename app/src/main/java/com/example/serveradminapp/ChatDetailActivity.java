@@ -3,6 +3,10 @@ package com.example.serveradminapp;
 import android.os.Bundle;
 import android.content.Intent;
 import android.widget.TextView;
+import android.widget.Button;
+import android.text.TextUtils;
+import androidx.core.text.HtmlCompat;
+
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,6 +19,9 @@ import java.io.IOException;
 
 public class ChatDetailActivity extends AppCompatActivity {
 
+    private String sessionId;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -26,13 +33,17 @@ public class ChatDetailActivity extends AppCompatActivity {
         }
         setContentView(R.layout.activity_chat_detail);
 
-        String sessionId = getIntent().getStringExtra("session_id");
+        sessionId = getIntent().getStringExtra("session_id");
+
         if (sessionId == null) {
             finish();
             return;
         }
 
         TextView messagesView = findViewById(R.id.messages_text);
+        Button refreshButton = findViewById(R.id.refresh_button);
+        refreshButton.setOnClickListener(v -> loadMessages(sessionId, messagesView));
+
         loadMessages(sessionId, messagesView);
     }
 
@@ -50,24 +61,42 @@ public class ChatDetailActivity extends AppCompatActivity {
                 response.close();
                 try {
                     JSONObject obj = new JSONObject(body);
+
+                    setTitle(obj.optString("title", obj.optString("session_id")));
+
                     JSONArray arr = obj.optJSONArray("messages");
                     StringBuilder sb = new StringBuilder();
                     if (arr != null) {
                         for (int i=0;i<arr.length();i++) {
                             JSONObject m = arr.getJSONObject(i);
-                            sb.append(m.optString("username"))
-                              .append(" ("+m.optString("role")+"):")
-                              .append('\n')
-                              .append(m.optString("content"))
-                              .append("\n\n");
+
+                            sb.append("<p><b")
+                              .append(">")
+                              .append(TextUtils.htmlEncode(m.optString("username")))
+                              .append(" (")
+                              .append(TextUtils.htmlEncode(m.optString("role")))
+                              .append("):</b><br>")
+                              .append(mdToHtml(m.optString("content")))
+                              .append("</p>");
                         }
                     }
-                    final String text = sb.toString();
+                    final CharSequence text = HtmlCompat.fromHtml(sb.toString(), HtmlCompat.FROM_HTML_MODE_LEGACY);
+
                     runOnUiThread(() -> view.setText(text));
                 } catch (JSONException ex) {
                     runOnUiThread(() -> view.setText("Error"));
                 }
             }
         });
+    }
+
+    /** Very small subset of Markdown to HTML conversion */
+    private String mdToHtml(String md) {
+        String html = TextUtils.htmlEncode(md);
+        html = html.replaceAll("\n", "<br>");
+        html = html.replaceAll("\*\*(.+?)\*\*", "<b>$1</b>");
+        html = html.replaceAll("\*(.+?)\*", "<i>$1</i>");
+        html = html.replaceAll("`(.+?)`", "<tt>$1</tt>");
+        return html;
     }
 }
