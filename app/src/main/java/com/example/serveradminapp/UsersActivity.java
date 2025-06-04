@@ -43,6 +43,8 @@ public class UsersActivity extends AppCompatActivity {
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, userList);
         listView.setAdapter(adapter);
         loadUsers();
+        connectWs();
+
 
         addButton.setOnClickListener(v -> showAddUserDialog());
         listView.setOnItemLongClickListener((parent, view, position, id) -> {
@@ -82,7 +84,12 @@ public class UsersActivity extends AppCompatActivity {
                     JSONArray array = new JSONArray(body);
                     userList.clear();
                     for (int i = 0; i < array.length(); i++) {
-                        userList.add(array.getString(i));
+                        Object item = array.get(i);
+                        if (item instanceof JSONObject) {
+                            userList.add(((JSONObject) item).optString("username"));
+                        } else {
+                            userList.add(String.valueOf(item));
+                        }
                     }
                     runOnUiThread(() -> adapter.notifyDataSetChanged());
                 } catch (JSONException ex) {
@@ -90,6 +97,43 @@ public class UsersActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    private okhttp3.WebSocket ws;
+
+    private void connectWs() {
+        ws = ServerApi.get().connectMetrics(new okhttp3.WebSocketListener() {
+            @Override
+            public void onMessage(@NonNull okhttp3.WebSocket webSocket, @NonNull String text) {
+                try {
+                    JSONObject obj = new JSONObject(text);
+                    JSONArray users = null;
+                    if (obj.has("users")) {
+                        users = obj.getJSONArray("users");
+                    } else if (obj.has("snapshot")) {
+                        users = obj.getJSONObject("snapshot").optJSONArray("users");
+                    }
+                    if (users != null) {
+                        ArrayList<String> list = new ArrayList<>();
+                        for (int i = 0; i < users.length(); i++) {
+                            JSONObject u = users.getJSONObject(i);
+                            list.add(u.optString("username"));
+                        }
+                        runOnUiThread(() -> {
+                            userList.clear();
+                            userList.addAll(list);
+                            adapter.notifyDataSetChanged();
+                        });
+                    }
+                } catch (JSONException ignore) {}
+            }
+        });
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (ws != null) ws.close(1000, null);
+        super.onDestroy();
     }
 
     private void showAddUserDialog() {
