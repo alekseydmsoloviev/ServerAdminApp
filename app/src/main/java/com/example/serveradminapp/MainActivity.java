@@ -72,6 +72,7 @@ public class MainActivity extends AppCompatActivity {
                     if (obj.has("cpu")) {
                         final String uptime = obj.optString("cpu") + "% CPU, " + obj.optString("memory") + "% MEM";
                         runOnUiThread(() -> uptimeText.setText(uptime));
+
                     } else if (obj.has("snapshot")) {
                         // overview snapshot may include usage or user arrays
                         JSONObject snap = obj.getJSONObject("snapshot");
@@ -153,6 +154,7 @@ public class MainActivity extends AppCompatActivity {
             }
             weekArray = new int[weekList.size()];
             for (int i = 0; i < weekList.size(); i++) weekArray[i] = weekList.get(i);
+
         } else if (obj.has("users")) {
             // overview snapshot format
             JSONArray users = obj.getJSONArray("users");
@@ -163,6 +165,7 @@ public class MainActivity extends AppCompatActivity {
                 if (week != null && weekArray.length == 0) weekArray = extractArray(week);
             }
             if (weekArray.length == 0) weekArray = extractArray(obj.opt("week"));
+
         } else {
             dayCount = extractSum(obj.opt("day"));
             weekArray = extractArray(obj.opt("week"));
