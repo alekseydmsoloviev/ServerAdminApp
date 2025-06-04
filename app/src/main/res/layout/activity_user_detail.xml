@@ -16,12 +16,27 @@
             android:textSize="18sp" />
 
         <TextView
+            android:id="@+id/detail_password"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/detail_created"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
             android:id="@+id/detail_admin"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
         <TextView
             android:id="@+id/detail_limit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/detail_chat_count"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 

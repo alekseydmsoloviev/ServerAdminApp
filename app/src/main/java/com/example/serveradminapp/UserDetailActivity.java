@@ -28,8 +28,11 @@ public class UserDetailActivity extends AppCompatActivity {
     private String username;
 
     private TextView usernameView;
+    private TextView passwordView;
+    private TextView createdView;
     private TextView adminView;
     private TextView limitView;
+    private TextView chatCountView;
     private TextView chatsView;
     private TextView dayView;
     private TextView totalView;
@@ -52,8 +55,11 @@ public class UserDetailActivity extends AppCompatActivity {
         }
 
         usernameView = findViewById(R.id.detail_username);
+        passwordView = findViewById(R.id.detail_password);
+        createdView = findViewById(R.id.detail_created);
         adminView = findViewById(R.id.detail_admin);
         limitView = findViewById(R.id.detail_limit);
+        chatCountView = findViewById(R.id.detail_chat_count);
         chatsView = findViewById(R.id.detail_chats);
         dayView = findViewById(R.id.detail_day);
         totalView = findViewById(R.id.detail_total);
@@ -106,8 +112,11 @@ public class UserDetailActivity extends AppCompatActivity {
     private void updateUi(JSONObject obj) {
         runOnUiThread(() -> {
             usernameView.setText(obj.optString("username", username));
+            passwordView.setText("Password: " + obj.optString("password", ""));
+            createdView.setText("Created: " + obj.optString("created_at", ""));
             adminView.setText("Admin: " + obj.optBoolean("is_admin"));
             limitView.setText("Limit: " + obj.optInt("daily_limit"));
+            chatCountView.setText("Chats: " + obj.optInt("chat_count"));
             dayView.setText("Last 24h: " + obj.optInt("day"));
             totalView.setText("Total: " + obj.optInt("total"));
             JSONArray chats = obj.optJSONArray("chats");
