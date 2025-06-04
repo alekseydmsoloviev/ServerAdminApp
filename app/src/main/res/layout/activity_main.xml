@@ -147,6 +147,12 @@
             android:text="Models" />
 
         <Button
+            android:id="@+id/chats_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Chats" />
+
+        <Button
             android:id="@+id/settings_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
