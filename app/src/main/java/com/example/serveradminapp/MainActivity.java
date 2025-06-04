@@ -20,10 +20,12 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
 
-    private TextView uptimeText;
+
+    private TextView metricsText;
+    private TextView resourceText;
     private TextView messages24hText;
-    private TextView messages7dText;
-    private View[] weekBars = new View[7];
+    private TextView messagesTotalText;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,16 +38,12 @@ public class MainActivity extends AppCompatActivity {
         }
         setContentView(R.layout.activity_main);
 
-        uptimeText = findViewById(R.id.uptime_text);
+
+        metricsText = findViewById(R.id.metrics_text);
+        resourceText = findViewById(R.id.resource_text);
         messages24hText = findViewById(R.id.messages_24h_text);
-        messages7dText = findViewById(R.id.messages_7d_text);
-        weekBars[0] = findViewById(R.id.bar1);
-        weekBars[1] = findViewById(R.id.bar2);
-        weekBars[2] = findViewById(R.id.bar3);
-        weekBars[3] = findViewById(R.id.bar4);
-        weekBars[4] = findViewById(R.id.bar5);
-        weekBars[5] = findViewById(R.id.bar6);
-        weekBars[6] = findViewById(R.id.bar7);
+        messagesTotalText = findViewById(R.id.messages_total_text);
+
 
         Button usersButton = findViewById(R.id.users_button);
         Button modelsButton = findViewById(R.id.models_button);
@@ -70,10 +68,20 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     JSONObject obj = new JSONObject(text);
                     if (obj.has("cpu")) {
-                        final String uptime = obj.optString("cpu") + "% CPU, " + obj.optString("memory") + "% MEM";
-                        runOnUiThread(() -> uptimeText.setText(uptime));
+
+                        final String metrics = "CPU: " + obj.optString("cpu") + "%  MEM: " + obj.optString("memory") + "%";
+                        final String res = "NET: " + obj.optString("network") + "%  DISK: " + obj.optString("disk") + "%";
+                        final int day = obj.optInt("day_total");
+                        final int total = obj.optInt("total");
+                        runOnUiThread(() -> {
+                            metricsText.setText(metrics);
+                            resourceText.setText(res);
+                            if (day > 0) messages24hText.setText("Messages last 24h: " + day);
+                            if (total > 0) messagesTotalText.setText("Messages total: " + total);
+                        });
                     } else if (obj.has("snapshot")) {
-                        // overview snapshot may include usage or user arrays
+                        // overview snapshot may include usage data
+
                         JSONObject snap = obj.getJSONObject("snapshot");
                         updateUsageFromJson(snap);
                     } else if ("progress".equals(obj.optString("type"))) {
@@ -98,8 +106,10 @@ public class MainActivity extends AppCompatActivity {
                 response.close();
                 try {
                     JSONObject obj = new JSONObject(body);
-                    final String uptime = obj.optString("port") + ", sessions: " + obj.optString("sessions");
-                    runOnUiThread(() -> uptimeText.setText(uptime));
+
+                    final String status = "Port " + obj.optString("port") + ", sessions: " + obj.optString("sessions");
+                    runOnUiThread(() -> metricsText.setText(status));
+
                 } catch (JSONException ignored) {}
             }
         });
@@ -111,7 +121,9 @@ public class MainActivity extends AppCompatActivity {
             public void onFailure(@NonNull okhttp3.Call call, @NonNull IOException e) {
                 runOnUiThread(() -> {
                     messages24hText.setText("Messages last 24h: --");
-                    messages7dText.setText("Messages last 7 days: --");
+
+                    messagesTotalText.setText("Messages total: --");
+
                 });
             }
 
@@ -130,102 +142,15 @@ public class MainActivity extends AppCompatActivity {
 
     /** Parse usage information from a JSON object and update the UI. */
     private void updateUsageFromJson(JSONObject obj) throws JSONException {
-        int dayCount = 0;
-        int[] weekArray = new int[0];
 
-        if (obj.has("usage")) {
-            JSONArray usage = obj.getJSONArray("usage");
-            java.util.List<Integer> weekList = new java.util.ArrayList<>();
-            for (int i = 0; i < usage.length(); i++) {
-                JSONObject u = usage.getJSONObject(i);
-                dayCount += u.optInt("day");
-                JSONArray week = u.optJSONArray("week");
-                if (week != null) {
-                    for (int j = 0; j < week.length(); j++) {
-                        int val = week.optInt(j);
-                        if (weekList.size() <= j) {
-                            weekList.add(val);
-                        } else {
-                            weekList.set(j, weekList.get(j) + val);
-                        }
-                    }
-                }
-            }
-            weekArray = new int[weekList.size()];
-            for (int i = 0; i < weekList.size(); i++) weekArray[i] = weekList.get(i);
-        } else if (obj.has("users")) {
-            // overview snapshot format
-            JSONArray users = obj.getJSONArray("users");
-            for (int i = 0; i < users.length(); i++) {
-                JSONObject u = users.getJSONObject(i);
-                dayCount += u.optInt("day");
-                JSONArray week = u.optJSONArray("week");
-                if (week != null && weekArray.length == 0) weekArray = extractArray(week);
-            }
-            if (weekArray.length == 0) weekArray = extractArray(obj.opt("week"));
-        } else {
-            dayCount = extractSum(obj.opt("day"));
-            weekArray = extractArray(obj.opt("week"));
-            if (dayCount == 0) dayCount = extractSum(obj.opt("last24h"));
-            if (weekArray.length == 0) weekArray = extractArray(obj.opt("last7d"));
-            if (weekArray.length == 0) weekArray = extractArray(obj.opt("week_usage"));
-        }
+        int dayCount = obj.optInt("day_total", obj.optInt("day"));
+        int totalCount = obj.optInt("total", dayCount);
 
-        int weekCount = 0;
-        for (int w : weekArray) weekCount += w;
-        if (weekCount == 0) weekCount = extractSum(obj); // fallback
-
-        final int[] weekBarsValues = weekArray;
         final int count24h = dayCount;
-        final int count7d = weekCount;
+        final int countTotal = totalCount;
         runOnUiThread(() -> {
             messages24hText.setText("Messages last 24h: " + count24h);
-            messages7dText.setText("Messages last 7 days: " + count7d);
-            updateWeekChart(weekBarsValues);
+            messagesTotalText.setText("Messages total: " + countTotal);
         });
-    }
-
-    private int extractSum(Object obj) throws JSONException {
-        if (obj == null) return 0;
-        if (obj instanceof Number) return ((Number) obj).intValue();
-        int sum = 0;
-        if (obj instanceof JSONArray) {
-            JSONArray arr = (JSONArray) obj;
-            for (int i = 0; i < arr.length(); i++) {
-                sum += extractSum(arr.get(i));
-            }
-        } else if (obj instanceof JSONObject) {
-            JSONObject o = (JSONObject) obj;
-            java.util.Iterator<String> it = o.keys();
-            while (it.hasNext()) {
-                sum += extractSum(o.get(it.next()));
-            }
-        } else if (obj instanceof String) {
-            try { sum = Integer.parseInt((String) obj); } catch (NumberFormatException ignored) {}
-        }
-        return sum;
-    }
-
-    private int[] extractArray(Object obj) throws JSONException {
-        if (obj instanceof JSONArray) {
-            JSONArray arr = (JSONArray) obj;
-            int[] result = new int[arr.length()];
-            for (int i = 0; i < arr.length(); i++) result[i] = arr.optInt(i);
-            return result;
-        }
-        return new int[0];
-    }
-
-    private void updateWeekChart(int[] counts) {
-        int max = 0;
-        for (int c : counts) if (c > max) max = c;
-        for (int i = 0; i < weekBars.length; i++) {
-            View bar = weekBars[i];
-            int val = i < counts.length ? counts[i] : 0;
-            int height = max == 0 ? 0 : (int) (100 * (val / (float) max));
-            ViewGroup.LayoutParams lp = bar.getLayoutParams();
-            lp.height = (int) (height * bar.getContext().getResources().getDisplayMetrics().density);
-            bar.setLayoutParams(lp);
-        }
     }
 }

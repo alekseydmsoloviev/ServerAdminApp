@@ -45,7 +45,6 @@ public class UsersActivity extends AppCompatActivity {
         loadUsers();
         connectWs();
 
-
         addButton.setOnClickListener(v -> showAddUserDialog());
         listView.setOnItemLongClickListener((parent, view, position, id) -> {
             String username = userList.get(position);

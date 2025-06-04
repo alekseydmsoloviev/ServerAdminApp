@@ -10,10 +10,18 @@
         android:padding="16dp">
 
         <TextView
-            android:id="@+id/uptime_text"
+
+            android:id="@+id/metrics_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Uptime: --" />
+            android:text="CPU: --  MEM: --" />
+
+        <TextView
+            android:id="@+id/resource_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="NET: --  DISK: --" />
+
 
         <TextView
             android:id="@+id/messages_24h_text"
@@ -22,10 +30,12 @@
             android:text="Messages last 24h: --" />
 
         <TextView
-            android:id="@+id/messages_7d_text"
+
+            android:id="@+id/messages_total_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Messages last 7 days:" />
+            android:text="Messages total:" />
+
 
         <LinearLayout
             android:id="@+id/week_chart"
