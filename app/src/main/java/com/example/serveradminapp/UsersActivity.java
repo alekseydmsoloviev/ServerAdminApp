@@ -47,8 +47,18 @@ public class UsersActivity extends AppCompatActivity {
         addButton.setOnClickListener(v -> showAddUserDialog());
         listView.setOnItemLongClickListener((parent, view, position, id) -> {
             String username = userList.get(position);
-            deleteUser(username);
+            new AlertDialog.Builder(this)
+                    .setMessage("Delete user " + username + "?")
+                    .setPositiveButton("Delete", (d,w)->deleteUser(username))
+                    .setNegativeButton("Cancel", null)
+                    .show();
             return true;
+        });
+        listView.setOnItemClickListener((p,v,pos,id)->{
+            String username = userList.get(pos);
+            Intent intent = new Intent(UsersActivity.this, UserDetailActivity.class);
+            intent.putExtra("username", username);
+            startActivity(intent);
         });
     }
 
