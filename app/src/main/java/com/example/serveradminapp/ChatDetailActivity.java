@@ -58,7 +58,7 @@ public class ChatDetailActivity extends AppCompatActivity {
                 response.close();
                 try {
                     JSONObject obj = new JSONObject(body);
-                    setTitle(obj.optString("title", obj.optString("session_id")));
+                    String pageTitle = obj.optString("title", obj.optString("session_id"));
                     JSONArray arr = obj.optJSONArray("messages");
                     StringBuilder sb = new StringBuilder();
                     if (arr != null) {
@@ -75,7 +75,11 @@ public class ChatDetailActivity extends AppCompatActivity {
                         }
                     }
                     final CharSequence text = HtmlCompat.fromHtml(sb.toString(), HtmlCompat.FROM_HTML_MODE_LEGACY);
-                    runOnUiThread(() -> view.setText(text));
+                    final String title = pageTitle;
+                    runOnUiThread(() -> {
+                        setTitle(title);
+                        view.setText(text);
+                    });
                 } catch (JSONException ex) {
                     runOnUiThread(() -> view.setText("Error"));
                 }
