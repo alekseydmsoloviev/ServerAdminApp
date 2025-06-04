@@ -17,6 +17,8 @@
         <activity android:name=".UserDetailActivity" />
         <activity android:name=".SettingsActivity" />
         <activity android:name=".ModelsActivity" />
+        <activity android:name=".ChatsActivity" />
+        <activity android:name=".ChatDetailActivity" />
         <activity android:name=".UsersActivity" />
         <activity
             android:name=".MainActivity"
