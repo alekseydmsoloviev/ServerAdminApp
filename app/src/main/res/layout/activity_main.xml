@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:id="@+id/uptime_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Uptime: --" />
+
+        <TextView
+            android:id="@+id/messages_24h_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Messages last 24h: --" />
+
+        <TextView
+            android:id="@+id/messages_7d_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Messages last 7 days:" />
+
+        <LinearLayout
+            android:id="@+id/week_chart"
+            android:layout_width="match_parent"
+            android:layout_height="120dp"
+            android:orientation="horizontal"
+            android:gravity="bottom"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="bottom">
+                <View
+                    android:id="@+id/bar1"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:background="@android:color/holo_blue_light" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="bottom">
+                <View
+                    android:id="@+id/bar2"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:background="@android:color/holo_blue_light" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="bottom">
+                <View
+                    android:id="@+id/bar3"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:background="@android:color/holo_blue_light" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="bottom">
+                <View
+                    android:id="@+id/bar4"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:background="@android:color/holo_blue_light" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="bottom">
+                <View
+                    android:id="@+id/bar5"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:background="@android:color/holo_blue_light" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="bottom">
+                <View
+                    android:id="@+id/bar6"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:background="@android:color/holo_blue_light" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="bottom">
+                <View
+                    android:id="@+id/bar7"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:background="@android:color/holo_blue_light" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/users_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Users" />
+
+        <Button
+            android:id="@+id/models_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Models" />
+
+        <Button
+            android:id="@+id/settings_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Server Settings" />
+    </LinearLayout>
+</ScrollView>
