@@ -173,6 +173,18 @@ public class ServerApi {
         client.newCall(request).enqueue(callback);
     }
 
+    /** Fetch full message history for a single session */
+    public void getSession(@NonNull String id, @NonNull Callback callback) {
+        Request request = baseRequest("/admin/api/sessions/" + id).get().build();
+        client.newCall(request).enqueue(callback);
+    }
+
+    /** Delete a chat session */
+    public void deleteSession(@NonNull String id, @NonNull Callback callback) {
+        Request request = baseRequest("/admin/api/sessions/" + id).delete().build();
+        client.newCall(request).enqueue(callback);
+    }
+
     public void loadConfig(@NonNull Callback callback) {
         Request request = baseRequest("/admin/api/config").get().build();
         client.newCall(request).enqueue(callback);
