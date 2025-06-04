@@ -185,7 +185,6 @@ public class ServerApi {
         client.newCall(request).enqueue(callback);
     }
 
-
     public void loadConfig(@NonNull Callback callback) {
         Request request = baseRequest("/admin/api/config").get().build();
         client.newCall(request).enqueue(callback);

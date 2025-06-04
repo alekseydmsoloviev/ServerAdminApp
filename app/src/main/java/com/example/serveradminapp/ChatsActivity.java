@@ -144,7 +144,6 @@ public class ChatsActivity extends AppCompatActivity {
             TextView created = convertView.findViewById(R.id.chat_created);
             View deleteBtn = convertView.findViewById(R.id.delete_button);
 
-
             String title = obj.optString("title");
             if (title == null || title.isEmpty() || "null".equals(title)) {
                 title = obj.optString("session_id");
