@@ -21,6 +21,8 @@ import java.io.IOException;
 
 import okhttp3.RequestBody;
 import okhttp3.MediaType;
+import okhttp3.WebSocket;
+import okhttp3.WebSocketListener;
 
 public class UserDetailActivity extends AppCompatActivity {
     private String username;
@@ -61,29 +63,44 @@ public class UserDetailActivity extends AppCompatActivity {
         editButton.setOnClickListener(v -> showEditDialog());
         deleteButton.setOnClickListener(v -> confirmDelete());
 
-        loadUser();
+        connectWs();
     }
+    private WebSocket webSocket;
 
-    private void loadUser() {
-        ServerApi.get().getUser(username, new okhttp3.Callback() {
+    private void connectWs() {
+        webSocket = ServerApi.get().connectMetrics(new WebSocketListener() {
             @Override
-            public void onFailure(@NonNull okhttp3.Call call, @NonNull IOException e) {
-                runOnUiThread(() -> Toast.makeText(UserDetailActivity.this, "Failed", Toast.LENGTH_SHORT).show());
-            }
-
-            @Override
-            public void onResponse(@NonNull okhttp3.Call call, @NonNull okhttp3.Response response) throws IOException {
-                if (!response.isSuccessful()) { response.close(); onFailure(call,new IOException("HTTP"+response.code())); return; }
-                String body = response.body().string();
-                response.close();
+            public void onMessage(@NonNull WebSocket webSocket, @NonNull String text) {
                 try {
-                    JSONObject obj = new JSONObject(body);
-                    updateUi(obj);
-                } catch (JSONException ex) {
-                    onFailure(call,new IOException(ex));
+                    JSONObject obj = new JSONObject(text);
+                    JSONObject snap = null;
+                    if (obj.has("snapshot")) {
+                        snap = obj.getJSONObject("snapshot");
+                    } else if (obj.has("users")) {
+                        snap = obj;
+                    }
+                    if (snap != null) {
+                        JSONArray users = snap.optJSONArray("users");
+                        if (users != null) {
+                            for (int i = 0; i < users.length(); i++) {
+                                JSONObject u = users.getJSONObject(i);
+                                if (username.equals(u.optString("username"))) {
+                                    updateUi(u);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                } catch (JSONException ignore) {
                 }
             }
         });
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (webSocket != null) webSocket.cancel();
+        super.onDestroy();
     }
 
     private void updateUi(JSONObject obj) {
@@ -151,7 +168,8 @@ public class UserDetailActivity extends AppCompatActivity {
                     response.close();
                     if (response.isSuccessful()) {
                         username = nameEdit.getText().toString().trim();
-                        loadUser();
+                        if (webSocket != null) webSocket.cancel();
+                        connectWs();
                     }
                 }
             });

@@ -97,7 +97,6 @@ public class ServerApi {
         client.newCall(request).enqueue(callback);
     }
 
-
     /** Fetch detailed info for a single user */
     public void getUser(@NonNull String username, @NonNull Callback callback) {
         Request request = baseRequest("/admin/api/users/" + username).get().build();
@@ -109,13 +108,11 @@ public class ServerApi {
         client.newCall(request).enqueue(callback);
     }
 
-
     /** Update an existing user with the given JSON body */
     public void updateUser(@NonNull RequestBody body, @NonNull Callback callback) {
         Request request = baseRequest("/admin/api/users").post(body).build();
         client.newCall(request).enqueue(callback);
     }
-
 
     public void deleteUser(@NonNull String username, @NonNull Callback callback) {
         Request request = baseRequest("/admin/api/users/" + username).delete().build();
@@ -170,13 +167,11 @@ public class ServerApi {
         client.newCall(request).enqueue(callback);
     }
 
-
     /** List all chat sessions */
     public void listSessions(@NonNull Callback callback) {
         Request request = baseRequest("/admin/api/sessions").get().build();
         client.newCall(request).enqueue(callback);
     }
-
 
     public void loadConfig(@NonNull Callback callback) {
         Request request = baseRequest("/admin/api/config").get().build();
