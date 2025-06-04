@@ -72,6 +72,14 @@ public class MainActivity extends AppCompatActivity {
                     if (obj.has("cpu")) {
                         final String uptime = obj.optString("cpu") + "% CPU, " + obj.optString("memory") + "% MEM";
                         runOnUiThread(() -> uptimeText.setText(uptime));
+
+                    } else if (obj.has("snapshot")) {
+                        // new API sends an overview snapshot that may contain usage statistics
+                        JSONObject snap = obj.getJSONObject("snapshot");
+                        if (snap.has("usage")) {
+                            updateUsageFromJson(snap);
+                        }
+
                     } else if ("progress".equals(obj.optString("type"))) {
                         // ignore progress for now
                     }
@@ -118,53 +126,56 @@ public class MainActivity extends AppCompatActivity {
                 response.close();
                 try {
                     JSONObject obj = new JSONObject(body);
-
-                    int dayCount = 0;
-                    int[] weekArray = new int[0];
-
-                    if (obj.has("usage")) {
-                        JSONArray usage = obj.getJSONArray("usage");
-                        java.util.List<Integer> weekList = new java.util.ArrayList<>();
-                        for (int i = 0; i < usage.length(); i++) {
-                            JSONObject u = usage.getJSONObject(i);
-                            dayCount += u.optInt("day");
-                            JSONArray week = u.optJSONArray("week");
-                            if (week != null) {
-                                for (int j = 0; j < week.length(); j++) {
-                                    int val = week.optInt(j);
-                                    if (weekList.size() <= j) {
-                                        weekList.add(val);
-                                    } else {
-                                        weekList.set(j, weekList.get(j) + val);
-                                    }
-                                }
-                            }
-                        }
-                        weekArray = new int[weekList.size()];
-                        for (int i = 0; i < weekList.size(); i++) weekArray[i] = weekList.get(i);
-                    } else {
-                        dayCount = extractSum(obj.opt("day"));
-                        weekArray = extractArray(obj.opt("week"));
-                        if (dayCount == 0) dayCount = extractSum(obj.opt("last24h"));
-                        if (weekArray.length == 0) weekArray = extractArray(obj.opt("last7d"));
-                        if (weekArray.length == 0) weekArray = extractArray(obj.opt("week_usage"));
-                    }
-
-                    int weekCount = 0;
-                    for (int w : weekArray) weekCount += w;
-                    if (weekCount == 0) weekCount = extractSum(obj); // fallback
-
-                    final int[] weekBarsValues = weekArray;
-
-                    final int count24h = dayCount;
-                    final int count7d = weekCount;
-                    runOnUiThread(() -> {
-                        messages24hText.setText("Messages last 24h: " + count24h);
-                        messages7dText.setText("Messages last 7 days: " + count7d);
-                        updateWeekChart(weekBarsValues);
-                    });
+                    updateUsageFromJson(obj);
                 } catch (JSONException ignored) {}
             }
+        });
+    }
+
+    /** Parse usage information from a JSON object and update the UI. */
+    private void updateUsageFromJson(JSONObject obj) throws JSONException {
+        int dayCount = 0;
+        int[] weekArray = new int[0];
+
+        if (obj.has("usage")) {
+            JSONArray usage = obj.getJSONArray("usage");
+            java.util.List<Integer> weekList = new java.util.ArrayList<>();
+            for (int i = 0; i < usage.length(); i++) {
+                JSONObject u = usage.getJSONObject(i);
+                dayCount += u.optInt("day");
+                JSONArray week = u.optJSONArray("week");
+                if (week != null) {
+                    for (int j = 0; j < week.length(); j++) {
+                        int val = week.optInt(j);
+                        if (weekList.size() <= j) {
+                            weekList.add(val);
+                        } else {
+                            weekList.set(j, weekList.get(j) + val);
+                        }
+                    }
+                }
+            }
+            weekArray = new int[weekList.size()];
+            for (int i = 0; i < weekList.size(); i++) weekArray[i] = weekList.get(i);
+        } else {
+            dayCount = extractSum(obj.opt("day"));
+            weekArray = extractArray(obj.opt("week"));
+            if (dayCount == 0) dayCount = extractSum(obj.opt("last24h"));
+            if (weekArray.length == 0) weekArray = extractArray(obj.opt("last7d"));
+            if (weekArray.length == 0) weekArray = extractArray(obj.opt("week_usage"));
+        }
+
+        int weekCount = 0;
+        for (int w : weekArray) weekCount += w;
+        if (weekCount == 0) weekCount = extractSum(obj); // fallback
+
+        final int[] weekBarsValues = weekArray;
+        final int count24h = dayCount;
+        final int count7d = weekCount;
+        runOnUiThread(() -> {
+            messages24hText.setText("Messages last 24h: " + count24h);
+            messages7dText.setText("Messages last 7 days: " + count7d);
+            updateWeekChart(weekBarsValues);
         });
     }
 
