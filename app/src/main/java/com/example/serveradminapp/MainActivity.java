@@ -43,12 +43,15 @@ public class MainActivity extends AppCompatActivity {
 
         Button usersButton = findViewById(R.id.users_button);
         Button modelsButton = findViewById(R.id.models_button);
+        Button chatsButton = findViewById(R.id.chats_button);
         Button settingsButton = findViewById(R.id.settings_button);
 
         usersButton.setOnClickListener(v ->
                 startActivity(new Intent(MainActivity.this, UsersActivity.class)));
         modelsButton.setOnClickListener(v ->
                 startActivity(new Intent(MainActivity.this, ModelsActivity.class)));
+        chatsButton.setOnClickListener(v ->
+                startActivity(new Intent(MainActivity.this, ChatsActivity.class)));
         settingsButton.setOnClickListener(v ->
                 startActivity(new Intent(MainActivity.this, SettingsActivity.class)));
 
