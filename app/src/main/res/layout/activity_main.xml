@@ -33,19 +33,88 @@
             android:layout_height="wrap_content"
             android:text="Messages total:" />
 
-        <HorizontalScrollView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:fillViewport="true">
+            android:orientation="horizontal"
+            android:gravity="center">
+
             <LinearLayout
-                android:id="@+id/user_chart"
-                android:layout_width="wrap_content"
-                android:layout_height="120dp"
-                android:orientation="horizontal"
-                android:gravity="bottom"
-                android:paddingTop="8dp"
-                android:paddingBottom="8dp" />
-        </HorizontalScrollView>
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <com.example.serveradminapp.GaugeView
+                    android:id="@+id/cpu_gauge"
+                    android:layout_width="72dp"
+                    android:layout_height="72dp"
+                    android:layout_margin="8dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="CPU" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <com.example.serveradminapp.GaugeView
+                    android:id="@+id/mem_gauge"
+                    android:layout_width="72dp"
+                    android:layout_height="72dp"
+                    android:layout_margin="8dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="MEM" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <com.example.serveradminapp.GaugeView
+                    android:id="@+id/net_gauge"
+                    android:layout_width="72dp"
+                    android:layout_height="72dp"
+                    android:layout_margin="8dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="NET" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <com.example.serveradminapp.GaugeView
+                    android:id="@+id/disk_gauge"
+                    android:layout_width="72dp"
+                    android:layout_height="72dp"
+                    android:layout_margin="8dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="DISK" />
+            </LinearLayout>
+        </LinearLayout>
 
         <Button
             android:id="@+id/users_button"
