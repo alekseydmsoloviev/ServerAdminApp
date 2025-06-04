@@ -74,12 +74,9 @@ public class MainActivity extends AppCompatActivity {
                         runOnUiThread(() -> uptimeText.setText(uptime));
 
                     } else if (obj.has("snapshot")) {
-                        // new API sends an overview snapshot that may contain usage statistics
+                        // overview snapshot may include usage or user arrays
                         JSONObject snap = obj.getJSONObject("snapshot");
-                        if (snap.has("usage")) {
-                            updateUsageFromJson(snap);
-                        }
-
+                        updateUsageFromJson(snap);
                     } else if ("progress".equals(obj.optString("type"))) {
                         // ignore progress for now
                     }
@@ -157,6 +154,18 @@ public class MainActivity extends AppCompatActivity {
             }
             weekArray = new int[weekList.size()];
             for (int i = 0; i < weekList.size(); i++) weekArray[i] = weekList.get(i);
+
+        } else if (obj.has("users")) {
+            // overview snapshot format
+            JSONArray users = obj.getJSONArray("users");
+            for (int i = 0; i < users.length(); i++) {
+                JSONObject u = users.getJSONObject(i);
+                dayCount += u.optInt("day");
+                JSONArray week = u.optJSONArray("week");
+                if (week != null && weekArray.length == 0) weekArray = extractArray(week);
+            }
+            if (weekArray.length == 0) weekArray = extractArray(obj.opt("week"));
+
         } else {
             dayCount = extractSum(obj.opt("day"));
             weekArray = extractArray(obj.opt("week"));
