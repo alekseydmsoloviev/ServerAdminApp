@@ -132,6 +132,7 @@ public class ChatsActivity extends AppCompatActivity {
 
     private class ChatAdapter extends ArrayAdapter<JSONObject> {
         ChatAdapter() { super(ChatsActivity.this, 0, chatList); }
+
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             if (convertView == null) {
@@ -141,6 +142,9 @@ public class ChatsActivity extends AppCompatActivity {
             TextView sid = convertView.findViewById(R.id.chat_title);
             TextView user = convertView.findViewById(R.id.chat_username);
             TextView created = convertView.findViewById(R.id.chat_created);
+            View deleteBtn = convertView.findViewById(R.id.delete_button);
+
+
             String title = obj.optString("title");
             if (title == null || title.isEmpty() || "null".equals(title)) {
                 title = obj.optString("session_id");
@@ -148,6 +152,23 @@ public class ChatsActivity extends AppCompatActivity {
             sid.setText(title);
             user.setText(obj.optString("username"));
             created.setText(obj.optString("created_at"));
+
+            deleteBtn.setOnClickListener(v -> {
+                String id = obj.optString("session_id");
+                ServerApi.get().deleteSession(id, new okhttp3.Callback() {
+                    @Override public void onFailure(@NonNull okhttp3.Call call, @NonNull IOException e) {}
+                    @Override public void onResponse(@NonNull okhttp3.Call call, @NonNull okhttp3.Response response) throws IOException {
+                        response.close();
+                        if (response.isSuccessful()) {
+                            runOnUiThread(() -> {
+                                chatList.remove(obj);
+                                notifyDataSetChanged();
+                            });
+                        }
+                    }
+                });
+            });
+
             return convertView;
         }
     }

@@ -34,105 +34,13 @@
             android:text="Messages total:" />
 
         <LinearLayout
-            android:id="@+id/week_chart"
+            android:id="@+id/user_chart"
             android:layout_width="match_parent"
             android:layout_height="120dp"
             android:orientation="horizontal"
             android:gravity="bottom"
             android:paddingTop="8dp"
-            android:paddingBottom="8dp">
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:gravity="bottom">
-                <View
-                    android:id="@+id/bar1"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:background="@android:color/holo_blue_light" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:gravity="bottom">
-                <View
-                    android:id="@+id/bar2"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:background="@android:color/holo_blue_light" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:gravity="bottom">
-                <View
-                    android:id="@+id/bar3"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:background="@android:color/holo_blue_light" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:gravity="bottom">
-                <View
-                    android:id="@+id/bar4"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:background="@android:color/holo_blue_light" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:gravity="bottom">
-                <View
-                    android:id="@+id/bar5"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:background="@android:color/holo_blue_light" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:gravity="bottom">
-                <View
-                    android:id="@+id/bar6"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:background="@android:color/holo_blue_light" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:gravity="bottom">
-                <View
-                    android:id="@+id/bar7"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:background="@android:color/holo_blue_light" />
-            </LinearLayout>
-        </LinearLayout>
+            android:paddingBottom="8dp" />
 
         <Button
             android:id="@+id/users_button"
