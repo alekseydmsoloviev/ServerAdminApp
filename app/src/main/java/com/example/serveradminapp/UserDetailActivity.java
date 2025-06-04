@@ -69,9 +69,32 @@ public class UserDetailActivity extends AppCompatActivity {
         editButton.setOnClickListener(v -> showEditDialog());
         deleteButton.setOnClickListener(v -> confirmDelete());
 
+        loadUser();
         connectWs();
     }
     private WebSocket webSocket;
+    private void loadUser() {
+        ServerApi.get().getUser(username, new okhttp3.Callback() {
+            @Override
+            public void onFailure(@NonNull okhttp3.Call call, @NonNull IOException e) {
+                // Ignore errors; UI will update when WebSocket snapshot arrives
+            }
+
+            @Override
+            public void onResponse(@NonNull okhttp3.Call call, @NonNull okhttp3.Response response) throws IOException {
+                if (!response.isSuccessful()) {
+                    response.close();
+                    return;
+                }
+                String body = response.body().string();
+                response.close();
+                try {
+                    JSONObject obj = new JSONObject(body);
+                    updateUi(obj);
+                } catch (JSONException ignore) { }
+            }
+        });
+    }
 
     private void connectWs() {
         webSocket = ServerApi.get().connectMetrics(new WebSocketListener() {
