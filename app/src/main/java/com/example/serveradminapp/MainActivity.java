@@ -20,12 +20,10 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
 
-
     private TextView metricsText;
     private TextView resourceText;
     private TextView messages24hText;
     private TextView messagesTotalText;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,12 +36,10 @@ public class MainActivity extends AppCompatActivity {
         }
         setContentView(R.layout.activity_main);
 
-
         metricsText = findViewById(R.id.metrics_text);
         resourceText = findViewById(R.id.resource_text);
         messages24hText = findViewById(R.id.messages_24h_text);
         messagesTotalText = findViewById(R.id.messages_total_text);
-
 
         Button usersButton = findViewById(R.id.users_button);
         Button modelsButton = findViewById(R.id.models_button);
@@ -106,7 +102,6 @@ public class MainActivity extends AppCompatActivity {
                 response.close();
                 try {
                     JSONObject obj = new JSONObject(body);
-
                     final String status = "Port " + obj.optString("port") + ", sessions: " + obj.optString("sessions");
                     runOnUiThread(() -> metricsText.setText(status));
 
@@ -121,7 +116,6 @@ public class MainActivity extends AppCompatActivity {
             public void onFailure(@NonNull okhttp3.Call call, @NonNull IOException e) {
                 runOnUiThread(() -> {
                     messages24hText.setText("Messages last 24h: --");
-
                     messagesTotalText.setText("Messages total: --");
 
                 });
@@ -142,7 +136,6 @@ public class MainActivity extends AppCompatActivity {
 
     /** Parse usage information from a JSON object and update the UI. */
     private void updateUsageFromJson(JSONObject obj) throws JSONException {
-
         int dayCount = obj.optInt("day_total", obj.optInt("day"));
         int totalCount = obj.optInt("total", dayCount);
 

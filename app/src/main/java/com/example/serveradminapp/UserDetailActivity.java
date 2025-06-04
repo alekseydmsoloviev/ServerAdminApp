@@ -200,6 +200,8 @@ public class UserDetailActivity extends AppCompatActivity {
                     response.close();
                     if (response.isSuccessful()) {
                         username = nameEdit.getText().toString().trim();
+                        JSONObject updated = obj;
+                        runOnUiThread(() -> updateUi(updated));
                         if (webSocket != null) webSocket.cancel();
                         connectWs();
                     }
