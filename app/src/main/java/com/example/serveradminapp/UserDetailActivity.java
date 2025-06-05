@@ -56,7 +56,6 @@ public class UserDetailActivity extends AppCompatActivity {
         }
         setContentView(R.layout.activity_user_detail);
 
-
         username = getIntent().getStringExtra("username");
         if (username == null) {
             finish();
