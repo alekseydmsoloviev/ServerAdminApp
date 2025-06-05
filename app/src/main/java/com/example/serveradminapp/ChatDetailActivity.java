@@ -6,6 +6,7 @@ import android.widget.TextView;
 import android.widget.Button;
 import android.text.TextUtils;
 import android.view.View;
+import android.content.Context;
 import androidx.core.text.HtmlCompat;
 
 import androidx.annotation.NonNull;
@@ -18,8 +19,13 @@ import org.json.JSONObject;
 import java.io.IOException;
 
 public class ChatDetailActivity extends AppCompatActivity {
-
+    
     private String sessionId;
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(LocaleUtil.attach(newBase));
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,10 +38,11 @@ public class ChatDetailActivity extends AppCompatActivity {
             return;
         }
         setContentView(R.layout.activity_chat_detail);
-        View backButton = findViewById(R.id.back_button);
-        backButton.setOnClickListener(v -> finish());
 
         sessionId = getIntent().getStringExtra("session_id");
+        if (sessionId == null) {
+            sessionId = getIntent().getStringExtra("id");
+        }
         if (sessionId == null) {
             finish();
             return;
@@ -73,7 +80,7 @@ public class ChatDetailActivity extends AppCompatActivity {
                     String pageTitle = obj.optString("title", obj.optString("session_id"));
                     JSONArray arr = obj.optJSONArray("messages");
                     StringBuilder sb = new StringBuilder();
-                    if (arr != null) {
+                    if (arr != null && arr.length() > 0) {
                         for (int i = 0; i < arr.length(); i++) {
                             JSONObject m = arr.getJSONObject(i);
                             sb.append("<p><b>")
@@ -84,6 +91,8 @@ public class ChatDetailActivity extends AppCompatActivity {
                               .append(mdToHtml(m.optString("content")))
                               .append("</p>");
                         }
+                    } else {
+                        sb.append(getString(R.string.no_messages));
                     }
                     final CharSequence text = HtmlCompat.fromHtml(sb.toString(), HtmlCompat.FROM_HTML_MODE_LEGACY);
                     final String title = pageTitle;
