@@ -30,6 +30,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="48dp"
                 android:background="@android:color/transparent"
+                android:clickable="false"
+                android:focusable="false"
                 android:src="@android:drawable/ic_menu_myplaces"
                 android:contentDescription="@string/users" />
             <View
@@ -75,6 +77,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="48dp"
                 android:background="@android:color/transparent"
+                android:clickable="false"
+                android:focusable="false"
                 android:src="@android:drawable/ic_menu_send"
                 android:contentDescription="@string/chats" />
             <View
@@ -97,6 +101,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="48dp"
                 android:background="@android:color/transparent"
+                android:clickable="false"
+                android:focusable="false"
                 android:src="@android:drawable/ic_menu_preferences"
                 android:contentDescription="@string/settings" />
             <View
@@ -119,6 +125,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="48dp"
                 android:background="@android:color/transparent"
+                android:clickable="false"
+                android:focusable="false"
                 android:src="@android:drawable/ic_menu_info_details"
                 android:contentDescription="@string/home" />
             <View
