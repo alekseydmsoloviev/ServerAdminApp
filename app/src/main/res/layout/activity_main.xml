@@ -18,50 +18,115 @@
         android:background="@drawable/bottom_bar"
         android:padding="8dp">
 
-        <ImageButton
+        <LinearLayout
             android:id="@+id/users_button"
             android:layout_width="0dp"
-            android:layout_height="48dp"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="@android:color/transparent"
-            android:src="@android:drawable/ic_menu_myplaces"
-            android:contentDescription="@string/users" />
+            android:orientation="vertical"
+            android:gravity="center">
+            <ImageButton
+                android:id="@+id/users_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:background="@android:color/transparent"
+                android:src="@android:drawable/ic_menu_myplaces"
+                android:contentDescription="@string/users" />
+            <View
+                android:id="@+id/users_indicator"
+                android:layout_width="match_parent"
+                android:layout_height="3dp"
+                android:background="@color/purple_500"
+                android:visibility="gone" />
+        </LinearLayout>
 
-        <TextView
+        <LinearLayout
             android:id="@+id/models_button"
             android:layout_width="0dp"
-            android:layout_height="48dp"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:gravity="center"
-            android:text="@string/ai"
-            android:textStyle="bold"
-            android:textSize="18sp" />
+            android:orientation="vertical"
+            android:gravity="center">
+            <TextView
+                android:id="@+id/models_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:gravity="center"
+                android:text="@string/ai"
+                android:textStyle="bold"
+                android:textSize="18sp" />
+            <View
+                android:id="@+id/models_indicator"
+                android:layout_width="match_parent"
+                android:layout_height="3dp"
+                android:background="@color/purple_500"
+                android:visibility="gone" />
+        </LinearLayout>
 
-        <ImageButton
+        <LinearLayout
             android:id="@+id/chats_button"
             android:layout_width="0dp"
-            android:layout_height="48dp"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="@android:color/transparent"
-            android:src="@android:drawable/ic_menu_send"
-            android:contentDescription="@string/chats" />
+            android:orientation="vertical"
+            android:gravity="center">
+            <ImageButton
+                android:id="@+id/chats_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:background="@android:color/transparent"
+                android:src="@android:drawable/ic_menu_send"
+                android:contentDescription="@string/chats" />
+            <View
+                android:id="@+id/chats_indicator"
+                android:layout_width="match_parent"
+                android:layout_height="3dp"
+                android:background="@color/purple_500"
+                android:visibility="gone" />
+        </LinearLayout>
 
-        <ImageButton
+        <LinearLayout
             android:id="@+id/settings_button"
             android:layout_width="0dp"
-            android:layout_height="48dp"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="@android:color/transparent"
-            android:src="@android:drawable/ic_menu_preferences"
-            android:contentDescription="@string/settings" />
+            android:orientation="vertical"
+            android:gravity="center">
+            <ImageButton
+                android:id="@+id/settings_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:background="@android:color/transparent"
+                android:src="@android:drawable/ic_menu_preferences"
+                android:contentDescription="@string/settings" />
+            <View
+                android:id="@+id/settings_indicator"
+                android:layout_width="match_parent"
+                android:layout_height="3dp"
+                android:background="@color/purple_500"
+                android:visibility="gone" />
+        </LinearLayout>
 
-        <ImageButton
+        <LinearLayout
             android:id="@+id/home_button"
             android:layout_width="0dp"
-            android:layout_height="48dp"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="@android:color/transparent"
-            android:src="@android:drawable/ic_menu_info_details"
-            android:contentDescription="@string/home" />
+            android:orientation="vertical"
+            android:gravity="center">
+            <ImageButton
+                android:id="@+id/home_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:background="@android:color/transparent"
+                android:src="@android:drawable/ic_menu_info_details"
+                android:contentDescription="@string/home" />
+            <View
+                android:id="@+id/home_indicator"
+                android:layout_width="match_parent"
+                android:layout_height="3dp"
+                android:background="@color/purple_500"
+                android:visibility="gone" />
+        </LinearLayout>
     </LinearLayout>
 </LinearLayout>

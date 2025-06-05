@@ -52,4 +52,6 @@
     <string name="deleted">Удалено</string>
     <string name="delete_user_q">Удалить пользователя %1$s?</string>
     <string name="delete_q">Удалить %1$s?</string>
+    <string name="back">Назад</string>
+    <string name="no_messages">Сообщений нет</string>
 </resources>

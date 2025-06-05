@@ -46,34 +46,30 @@ public class SettingsFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         EditText portEdit = view.findViewById(R.id.port_edit);
         EditText limitEdit = view.findViewById(R.id.limit_edit);
-        android.widget.Spinner langSpinner = view.findViewById(R.id.lang_spinner);
-        langSpinner.setAdapter(android.widget.ArrayAdapter.createFromResource(requireContext(),
-                R.array.languages, android.R.layout.simple_spinner_item));
-        langSpinner.setSelection("ru".equals(requireActivity().getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
-                .getString("lang", Locale.getDefault().getLanguage())) ? 1 : 0);
-        langSpinner.post(() -> langSpinner.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
-            int last = langSpinner.getSelectedItemPosition();
+        Button langEn = view.findViewById(R.id.lang_en);
+        Button langRu = view.findViewById(R.id.lang_ru);
 
-            @Override
-            public void onItemSelected(android.widget.AdapterView<?> parent, View itemView, int position, long id) {
-                if (position != last) {
-                    last = position;
-                    String lang = position == 1 ? "ru" : "en";
-                    LocaleUtil.setLocale(requireContext(), lang);
-                    requireActivity().recreate();
-                }
-            }
+        String current = requireActivity().getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+                .getString("lang", Locale.getDefault().getLanguage());
+        updateLangButtons(langEn, langRu, current);
 
-            @Override
-            public void onNothingSelected(android.widget.AdapterView<?> parent) {
-            }
-        }));
+        langEn.setOnClickListener(v -> {
+            LocaleUtil.setLocale(requireContext(), "en");
+            updateLangButtons(langEn, langRu, "en");
+            requireActivity().recreate();
+        });
+
+        langRu.setOnClickListener(v -> {
+            LocaleUtil.setLocale(requireContext(), "ru");
+            updateLangButtons(langEn, langRu, "ru");
+            requireActivity().recreate();
+        });
         Button saveButton = view.findViewById(R.id.save_button);
         Button restartButton = view.findViewById(R.id.restart_button);
 
         loadConfig(portEdit, limitEdit);
 
-        saveButton.setOnClickListener(v -> saveConfig(portEdit, limitEdit, langSpinner));
+        saveButton.setOnClickListener(v -> saveConfig(portEdit, limitEdit));
         restartButton.setOnClickListener(v -> restartServer());
     }
 
@@ -107,7 +103,7 @@ public class SettingsFragment extends Fragment {
         });
     }
 
-    private void saveConfig(EditText portEdit, EditText limitEdit, android.widget.Spinner langSpinner) {
+    private void saveConfig(EditText portEdit, EditText limitEdit) {
         JSONObject obj = new JSONObject();
         try {
             obj.put("port", Integer.parseInt(portEdit.getText().toString().trim()));
@@ -117,8 +113,6 @@ public class SettingsFragment extends Fragment {
             return;
         }
         RequestBody body = RequestBody.create(obj.toString(), MediaType.get("application/json"));
-        String lang = langSpinner.getSelectedItemPosition() == 1 ? "ru" : "en";
-        LocaleUtil.setLocale(requireContext(), lang);
         ServerApi.get().updateConfig(body, new okhttp3.Callback() {
             @Override
             public void onFailure(@NonNull okhttp3.Call call, @NonNull IOException e) {
@@ -150,5 +144,17 @@ public class SettingsFragment extends Fragment {
                         android.widget.Toast.makeText(requireContext(), getString(R.string.restarting), android.widget.Toast.LENGTH_SHORT).show());
             }
         });
+    }
+
+    private void updateLangButtons(Button en, Button ru, String lang) {
+        int sel = requireContext().getColor(R.color.purple_500);
+        int unsel = requireContext().getColor(R.color.lang_unselected);
+        if ("ru".equals(lang)) {
+            ru.setBackgroundColor(sel);
+            en.setBackgroundColor(unsel);
+        } else {
+            en.setBackgroundColor(sel);
+            ru.setBackgroundColor(unsel);
+        }
     }
 }

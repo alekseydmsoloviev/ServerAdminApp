@@ -52,4 +52,6 @@
     <string name="deleted">Deleted</string>
     <string name="delete_user_q">Delete user %1$s?</string>
     <string name="delete_q">Delete %1$s?</string>
+    <string name="back">Back</string>
+    <string name="no_messages">No messages</string>
 </resources>

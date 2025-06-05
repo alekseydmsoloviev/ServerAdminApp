@@ -87,7 +87,8 @@ public class ChatsFragment extends Fragment {
         listView.setOnItemClickListener((p,v,pos,id)->{
             JSONObject obj = chatList.get(pos);
             Intent intent = new Intent(requireContext(), ChatDetailActivity.class);
-            intent.putExtra("session_id", obj.optString("session_id"));
+            String sid = obj.optString("session_id", obj.optString("id"));
+            intent.putExtra("session_id", sid);
             startActivity(intent);
         });
 

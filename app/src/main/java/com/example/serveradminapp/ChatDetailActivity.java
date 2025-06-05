@@ -41,6 +41,9 @@ public class ChatDetailActivity extends AppCompatActivity {
 
         sessionId = getIntent().getStringExtra("session_id");
         if (sessionId == null) {
+            sessionId = getIntent().getStringExtra("id");
+        }
+        if (sessionId == null) {
             finish();
             return;
         }
@@ -49,7 +52,9 @@ public class ChatDetailActivity extends AppCompatActivity {
         messagesView.setText(R.string.loading);
 
         View refreshButton = findViewById(R.id.refresh_button);
+        View backButton = findViewById(R.id.back_button);
         refreshButton.setOnClickListener(v -> loadMessages(sessionId, messagesView));
+        backButton.setOnClickListener(v -> finish());
 
         loadMessages(sessionId, messagesView);
     }
@@ -77,7 +82,7 @@ public class ChatDetailActivity extends AppCompatActivity {
                     String pageTitle = obj.optString("title", obj.optString("session_id"));
                     JSONArray arr = obj.optJSONArray("messages");
                     StringBuilder sb = new StringBuilder();
-                    if (arr != null) {
+                    if (arr != null && arr.length() > 0) {
                         for (int i = 0; i < arr.length(); i++) {
                             JSONObject m = arr.getJSONObject(i);
                             sb.append("<p><b>")
@@ -88,6 +93,8 @@ public class ChatDetailActivity extends AppCompatActivity {
                               .append(mdToHtml(m.optString("content")))
                               .append("</p>");
                         }
+                    } else {
+                        sb.append(getString(R.string.no_messages));
                     }
                     final CharSequence text = HtmlCompat.fromHtml(sb.toString(), HtmlCompat.FROM_HTML_MODE_LEGACY);
                     final String title = pageTitle;
