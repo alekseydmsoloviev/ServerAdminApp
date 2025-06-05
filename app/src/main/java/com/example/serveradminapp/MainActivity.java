@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.widget.TextView;
 import android.view.View;
+import android.content.Context;
 import com.example.serveradminapp.GaugeView;
 
 import androidx.annotation.NonNull;
@@ -30,6 +31,12 @@ public class MainActivity extends AppCompatActivity {
     private GaugeView diskGauge;
     private WebSocket metricsSocket;
     private final Runnable reconnectRunnable = this::connectMetrics;
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(LocaleUtil.attach(newBase));
+    }
+
     private final WebSocketListener metricsListener = new WebSocketListener() {
         @Override
         public void onOpen(@NonNull WebSocket webSocket, @NonNull Response response) {

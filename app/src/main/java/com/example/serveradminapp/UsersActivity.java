@@ -10,6 +10,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.LinearLayout;
 import android.view.View;
+import android.content.Context;
 import java.util.ArrayList;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -27,6 +28,11 @@ public class UsersActivity extends AppCompatActivity {
     private ListView listView;
     private ArrayAdapter<String> adapter;
     private ArrayList<String> userList = new ArrayList<>();
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(LocaleUtil.attach(newBase));
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
