@@ -3,10 +3,9 @@ package com.example.serveradminapp;
 import android.os.Bundle;
 import android.content.Intent;
 import android.widget.TextView;
-import android.widget.Button;
-import android.text.TextUtils;
 import android.view.View;
 import android.content.Context;
+import android.text.TextUtils;
 import androidx.core.text.HtmlCompat;
 
 import androidx.annotation.NonNull;
@@ -52,9 +51,7 @@ public class ChatDetailActivity extends AppCompatActivity {
         messagesView.setText(R.string.loading);
 
         View refreshButton = findViewById(R.id.refresh_button);
-        View backButton = findViewById(R.id.back_button);
         refreshButton.setOnClickListener(v -> loadMessages(sessionId, messagesView));
-        backButton.setOnClickListener(v -> finish());
 
         loadMessages(sessionId, messagesView);
     }
@@ -96,7 +93,8 @@ public class ChatDetailActivity extends AppCompatActivity {
                     } else {
                         sb.append(getString(R.string.no_messages));
                     }
-                    final CharSequence text = HtmlCompat.fromHtml(sb.toString(), HtmlCompat.FROM_HTML_MODE_LEGACY);
+                    final CharSequence text = HtmlCompat.fromHtml(sb.toString(),
+                            HtmlCompat.FROM_HTML_MODE_LEGACY);
                     final String title = pageTitle;
                     runOnUiThread(() -> {
                         setTitle(title);
@@ -119,4 +117,5 @@ public class ChatDetailActivity extends AppCompatActivity {
         html = html.replaceAll("\\Q`\\E(.+?)\\Q`\\E", "<tt>$1</tt>");
         return html;
     }
+
 }

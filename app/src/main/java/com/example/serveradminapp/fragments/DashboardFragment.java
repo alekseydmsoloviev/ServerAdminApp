@@ -37,8 +37,6 @@ public class DashboardFragment extends Fragment {
     private GaugeView memGauge;
     private GaugeView netGauge;
     private GaugeView diskGauge;
-    private WebSocket metricsSocket;
-    private final Runnable reconnectRunnable = this::connectMetrics;
     private final Handler statusHandler = new Handler(Looper.getMainLooper());
     private final Runnable statusTimeout =
             () -> serverStateText.setText(getString(R.string.status_stop));
@@ -81,28 +79,23 @@ public class DashboardFragment extends Fragment {
     @Override
     public void onDestroyView() {
         statusHandler.removeCallbacks(statusTimeout);
-        statusHandler.removeCallbacks(reconnectRunnable);
-        if (metricsSocket != null) metricsSocket.cancel();
-        metricsSocket = null;
+        ServerApi.get().setMetricsListener(null);
         super.onDestroyView();
     }
 
     private final WebSocketListener metricsListener = new WebSocketListener() {
         @Override
         public void onOpen(@NonNull WebSocket webSocket, @NonNull Response response) {
-            metricsSocket = webSocket;
             setStatusWork();
         }
 
         @Override
         public void onClosed(@NonNull WebSocket webSocket, int code, @NonNull String reason) {
-            metricsSocket = null;
             setStatusStop();
         }
 
         @Override
         public void onFailure(@NonNull WebSocket webSocket, @NonNull Throwable t, Response response) {
-            metricsSocket = null;
             setStatusStop();
         }
 
@@ -139,7 +132,6 @@ public class DashboardFragment extends Fragment {
 
     private void setStatusWork() {
         statusHandler.removeCallbacks(statusTimeout);
-        statusHandler.removeCallbacks(reconnectRunnable);
         statusHandler.post(() -> {
             if (isAdded()) {
                 serverStateText.setText(getString(R.string.status_work));
@@ -155,16 +147,13 @@ public class DashboardFragment extends Fragment {
                 serverStateText.setText(getString(R.string.status_stop));
             }
         });
-        statusHandler.postDelayed(reconnectRunnable, 5000);
     }
 
     private void connectMetrics() {
-        if (metricsSocket != null) {
-            metricsSocket.cancel();
-            metricsSocket = null;
-        }
-        metricsSocket = ServerApi.get().connectMetrics(metricsListener);
-        if (metricsSocket == null) {
+        ServerApi.get().setMetricsListener(metricsListener);
+        if (ServerApi.get().isMetricsOpen()) {
+            setStatusWork();
+        } else {
             setStatusStop();
         }
     }

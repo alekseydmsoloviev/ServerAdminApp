@@ -38,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
         setContentView(R.layout.activity_main);
+        ServerApi.get().startMetricsSocket();
 
         View usersButton = findViewById(R.id.users_button);
         View modelsButton = findViewById(R.id.models_button);
@@ -77,5 +78,11 @@ public class MainActivity extends AppCompatActivity {
         if (active != null) {
             active.setVisibility(View.VISIBLE);
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        ServerApi.get().stopMetricsSocket();
+        super.onDestroy();
     }
 }
