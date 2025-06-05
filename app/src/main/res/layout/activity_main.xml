@@ -9,61 +9,165 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <TextView
-            android:id="@+id/metrics_text"
+        <ImageButton
+            android:id="@+id/back_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="CPU: --  MEM: --" />
+            android:background="@android:color/transparent"
+            android:src="@android:drawable/ic_media_previous" />
 
         <TextView
-            android:id="@+id/resource_text"
-            android:layout_width="wrap_content"
+            android:id="@+id/server_state_text"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="NET: --  DISK: --" />
+            android:text="Status: Stop"
+            android:textSize="24sp"
+            android:gravity="center" />
 
         <TextView
             android:id="@+id/messages_24h_text"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Messages last 24h: --" />
+            android:text="Messages last 24h: --"
+            android:textSize="20sp"
+            android:gravity="center" />
 
         <TextView
             android:id="@+id/messages_total_text"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Messages total:" />
+            android:text="Messages total:"
+            android:textSize="20sp"
+            android:gravity="center" />
 
         <LinearLayout
-            android:id="@+id/user_chart"
             android:layout_width="match_parent"
-            android:layout_height="120dp"
+            android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:gravity="bottom"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp" />
+            android:gravity="center">
 
-        <Button
-            android:id="@+id/users_button"
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <com.example.serveradminapp.GaugeView
+                    android:id="@+id/cpu_gauge"
+                    android:layout_width="72dp"
+                    android:layout_height="72dp"
+                    android:layout_margin="8dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="CPU" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <com.example.serveradminapp.GaugeView
+                    android:id="@+id/mem_gauge"
+                    android:layout_width="72dp"
+                    android:layout_height="72dp"
+                    android:layout_margin="8dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="MEM" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <com.example.serveradminapp.GaugeView
+                    android:id="@+id/net_gauge"
+                    android:layout_width="72dp"
+                    android:layout_height="72dp"
+                    android:layout_margin="8dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="NET" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <com.example.serveradminapp.GaugeView
+                    android:id="@+id/disk_gauge"
+                    android:layout_width="72dp"
+                    android:layout_height="72dp"
+                    android:layout_margin="8dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="DISK" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Users" />
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/bottom_bar"
+            android:padding="8dp">
 
-        <Button
-            android:id="@+id/models_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Models" />
+            <ImageButton
+                android:id="@+id/users_button"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:src="@android:drawable/ic_menu_myplaces"
+                android:contentDescription="Users" />
 
-        <Button
-            android:id="@+id/chats_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Chats" />
+            <TextView
+                android:id="@+id/models_button"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="AI"
+                android:textStyle="bold"
+                android:textSize="18sp" />
 
-        <Button
-            android:id="@+id/settings_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Server Settings" />
+            <ImageButton
+                android:id="@+id/chats_button"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:src="@android:drawable/ic_menu_send"
+                android:contentDescription="Chats" />
+
+            <ImageButton
+                android:id="@+id/settings_button"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:src="@android:drawable/ic_menu_preferences"
+                android:contentDescription="Settings" />
+        </LinearLayout>
     </LinearLayout>
 </ScrollView>
