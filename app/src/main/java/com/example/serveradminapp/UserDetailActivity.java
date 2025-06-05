@@ -9,6 +9,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
+import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -47,6 +48,9 @@ public class UserDetailActivity extends AppCompatActivity {
             return;
         }
         setContentView(R.layout.activity_user_detail);
+
+        View backButton = findViewById(R.id.back_button);
+        backButton.setOnClickListener(v -> finish());
 
         username = getIntent().getStringExtra("username");
         if (username == null) {

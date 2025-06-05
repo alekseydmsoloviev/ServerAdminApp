@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.widget.TextView;
 import android.widget.Button;
 import android.text.TextUtils;
+import android.view.View;
 import androidx.core.text.HtmlCompat;
 
 import androidx.annotation.NonNull;
@@ -30,6 +31,8 @@ public class ChatDetailActivity extends AppCompatActivity {
             return;
         }
         setContentView(R.layout.activity_chat_detail);
+        View backButton = findViewById(R.id.back_button);
+        backButton.setOnClickListener(v -> finish());
 
         sessionId = getIntent().getStringExtra("session_id");
         if (sessionId == null) {
@@ -40,7 +43,7 @@ public class ChatDetailActivity extends AppCompatActivity {
         TextView messagesView = findViewById(R.id.messages_text);
         messagesView.setText(R.string.loading);
 
-        Button refreshButton = findViewById(R.id.refresh_button);
+        View refreshButton = findViewById(R.id.refresh_button);
         refreshButton.setOnClickListener(v -> loadMessages(sessionId, messagesView));
 
         loadMessages(sessionId, messagesView);
