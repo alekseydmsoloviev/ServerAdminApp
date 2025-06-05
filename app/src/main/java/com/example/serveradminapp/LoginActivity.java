@@ -82,8 +82,9 @@ public class LoginActivity extends AppCompatActivity {
                     if (response.isSuccessful()) {
                         ServerApi.saveCredentials(LoginActivity.this, server, username, password);
                         dbHelper.saveAccount(server, username, password);
-                        loadAccounts();
+
                         runOnUiThread(() -> {
+                            loadAccounts();
                             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                             startActivity(intent);
                             finish();

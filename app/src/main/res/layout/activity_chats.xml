@@ -11,6 +11,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical">
+
         <ImageButton
             android:id="@+id/back_button"
             android:layout_width="wrap_content"
@@ -19,15 +20,15 @@
             android:src="@drawable/ic_back"
             android:contentDescription="@string/back" />
 
-        <View
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1" />
-
         <Spinner
             android:id="@+id/sort_spinner"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
 
         <ImageButton
             android:id="@+id/refresh_button"
