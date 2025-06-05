@@ -43,7 +43,7 @@ public class ChatDetailActivity extends AppCompatActivity {
         TextView messagesView = findViewById(R.id.messages_text);
         messagesView.setText(R.string.loading);
 
-        Button refreshButton = findViewById(R.id.refresh_button);
+        View refreshButton = findViewById(R.id.refresh_button);
         refreshButton.setOnClickListener(v -> loadMessages(sessionId, messagesView));
 
         loadMessages(sessionId, messagesView);

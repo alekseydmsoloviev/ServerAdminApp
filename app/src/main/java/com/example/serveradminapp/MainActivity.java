@@ -106,8 +106,6 @@ public class MainActivity extends AppCompatActivity {
 
         serverStateText = findViewById(R.id.server_state_text);
         serverStateText.setText("Status: Stop");
-        View backButton = findViewById(R.id.back_button);
-        backButton.setOnClickListener(v -> finish());
         messages24hText = findViewById(R.id.messages_24h_text);
         messagesTotalText = findViewById(R.id.messages_total_text);
         cpuGauge = findViewById(R.id.cpu_gauge);
