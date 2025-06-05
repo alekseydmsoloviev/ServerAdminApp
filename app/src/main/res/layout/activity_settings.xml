@@ -27,8 +27,8 @@
 
     <Spinner
         android:id="@+id/lang_spinner"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="56dp"
+        android:padding="8dp" />
 
     <Button
         android:id="@+id/save_button"

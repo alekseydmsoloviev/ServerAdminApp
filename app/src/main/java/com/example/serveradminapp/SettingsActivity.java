@@ -35,8 +35,27 @@ public class SettingsActivity extends AppCompatActivity {
         EditText portEdit = findViewById(R.id.port_edit);
         EditText limitEdit = findViewById(R.id.limit_edit);
         android.widget.Spinner langSpinner = findViewById(R.id.lang_spinner);
-        langSpinner.setAdapter(android.widget.ArrayAdapter.createFromResource(this, R.array.languages, android.R.layout.simple_spinner_item));
-        langSpinner.setSelection("ru".equals(getSharedPreferences("app_prefs", MODE_PRIVATE).getString("lang", Locale.getDefault().getLanguage())) ? 1 : 0);
+        langSpinner.setAdapter(android.widget.ArrayAdapter.createFromResource(this,
+                R.array.languages, android.R.layout.simple_spinner_item));
+        langSpinner.setSelection("ru".equals(getSharedPreferences("app_prefs",
+                MODE_PRIVATE).getString("lang", Locale.getDefault().getLanguage())) ? 1 : 0);
+        langSpinner.post(() -> langSpinner.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
+            int last = langSpinner.getSelectedItemPosition();
+
+            @Override
+            public void onItemSelected(android.widget.AdapterView<?> parent, View view, int position, long id) {
+                if (position != last) {
+                    last = position;
+                    String lang = position == 1 ? "ru" : "en";
+                    LocaleUtil.setLocale(SettingsActivity.this, lang);
+                    recreate();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(android.widget.AdapterView<?> parent) {
+            }
+        }));
         Button saveButton = findViewById(R.id.save_button);
         Button restartButton = findViewById(R.id.restart_button);
 
