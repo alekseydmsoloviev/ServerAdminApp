@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.content.Intent;
 
 import java.util.Locale;
 
@@ -44,5 +45,12 @@ public class LocaleUtil {
             context = context.createConfigurationContext(newConfig);
         }
         return context;
+    }
+
+    /** Restart the given activity to apply configuration changes safely. */
+    public static void restart(Activity activity) {
+        Intent intent = activity.getIntent();
+        activity.finish();
+        activity.startActivity(intent);
     }
 }

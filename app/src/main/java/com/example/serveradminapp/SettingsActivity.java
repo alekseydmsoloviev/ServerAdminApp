@@ -55,7 +55,7 @@ public class SettingsActivity extends AppCompatActivity {
                     last = position;
                     String lang = position == 1 ? "ru" : "en";
                     LocaleUtil.setLocale(SettingsActivity.this, lang);
-                    recreate();
+                    LocaleUtil.restart(SettingsActivity.this);
                 }
             }
 
