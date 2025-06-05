@@ -10,28 +10,28 @@
         android:padding="16dp">
 
         <TextView
-            android:id="@+id/metrics_text"
-            android:layout_width="wrap_content"
+            android:id="@+id/server_state_text"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="CPU: --  MEM: --" />
-
-        <TextView
-            android:id="@+id/resource_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="NET: --  DISK: --" />
+            android:text="Stop"
+            android:textSize="24sp"
+            android:gravity="center" />
 
         <TextView
             android:id="@+id/messages_24h_text"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Messages last 24h: --" />
+            android:text="Messages last 24h: --"
+            android:textSize="20sp"
+            android:gravity="center" />
 
         <TextView
             android:id="@+id/messages_total_text"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Messages total:" />
+            android:text="Messages total:"
+            android:textSize="20sp"
+            android:gravity="center" />
 
         <LinearLayout
             android:layout_width="match_parent"
