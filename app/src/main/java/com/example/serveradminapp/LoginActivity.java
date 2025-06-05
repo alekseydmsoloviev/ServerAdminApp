@@ -4,9 +4,15 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.ArrayAdapter;
 import android.content.SharedPreferences;
 import android.content.Context;
+import java.util.ArrayList;
+import java.util.List;
 import com.example.serveradminapp.databinding.ActivityLoginBinding;
+import com.example.serveradminapp.Account;
+import com.example.serveradminapp.AccountDbHelper;
 
 import androidx.annotation.NonNull;
 import java.io.IOException;
@@ -18,6 +24,10 @@ public class LoginActivity extends AppCompatActivity {
     private EditText usernameEdit;
     private EditText passwordEdit;
     private EditText serverEdit;
+    private ListView accountList;
+    private ArrayAdapter<String> accountAdapter;
+    private final List<Account> accounts = new ArrayList<>();
+    private AccountDbHelper dbHelper;
 
     @Override
     protected void attachBaseContext(Context newBase) {
@@ -34,12 +44,24 @@ public class LoginActivity extends AppCompatActivity {
         usernameEdit = binding.usernameEdit;
         passwordEdit = binding.passwordEdit;
         serverEdit = binding.serverEdit;
+        accountList = binding.accountList;
+        dbHelper = new AccountDbHelper(this);
+        accountAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, new ArrayList<>());
+        accountList.setAdapter(accountAdapter);
+        accountList.setOnItemClickListener((p,v,pos,id)->{
+            Account a = accounts.get(pos);
+            serverEdit.setText(a.server);
+            usernameEdit.setText(a.username);
+            passwordEdit.setText(a.password);
+        });
         ServerApi.restore(this);
         SharedPreferences prefs = getSharedPreferences("server_api", MODE_PRIVATE);
         serverEdit.setText(prefs.getString("url", ""));
         usernameEdit.setText(prefs.getString("user", ""));
         passwordEdit.setText(prefs.getString("pass", ""));
         Button loginButton = binding.loginButton;
+
+        loadAccounts();
 
         loginButton.setOnClickListener(v -> {
             String server = serverEdit.getText().toString().trim();
@@ -59,6 +81,8 @@ public class LoginActivity extends AppCompatActivity {
                     response.close();
                     if (response.isSuccessful()) {
                         ServerApi.saveCredentials(LoginActivity.this, server, username, password);
+                        dbHelper.saveAccount(server, username, password);
+                        loadAccounts();
                         runOnUiThread(() -> {
                             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                             startActivity(intent);
@@ -71,5 +95,17 @@ public class LoginActivity extends AppCompatActivity {
                 }
             });
         });
+    }
+
+    private void loadAccounts() {
+        accounts.clear();
+        accounts.addAll(dbHelper.loadAccounts());
+        ArrayList<String> names = new ArrayList<>();
+        for (Account a : accounts) {
+            names.add(a.server + " - " + a.username);
+        }
+        accountAdapter.clear();
+        accountAdapter.addAll(names);
+        accountAdapter.notifyDataSetChanged();
     }
 }
