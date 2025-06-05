@@ -38,7 +38,6 @@ public class DashboardFragment extends Fragment {
     private GaugeView netGauge;
     private GaugeView diskGauge;
     private WebSocket metricsSocket;
-    private final Runnable reconnectRunnable = this::connectMetrics;
     private final Handler statusHandler = new Handler(Looper.getMainLooper());
     private final Runnable statusTimeout =
             () -> serverStateText.setText(getString(R.string.status_stop));
@@ -81,7 +80,6 @@ public class DashboardFragment extends Fragment {
     @Override
     public void onDestroyView() {
         statusHandler.removeCallbacks(statusTimeout);
-        statusHandler.removeCallbacks(reconnectRunnable);
         if (metricsSocket != null) metricsSocket.cancel();
         metricsSocket = null;
         super.onDestroyView();
@@ -139,7 +137,6 @@ public class DashboardFragment extends Fragment {
 
     private void setStatusWork() {
         statusHandler.removeCallbacks(statusTimeout);
-        statusHandler.removeCallbacks(reconnectRunnable);
         statusHandler.post(() -> {
             if (isAdded()) {
                 serverStateText.setText(getString(R.string.status_work));
@@ -155,7 +152,6 @@ public class DashboardFragment extends Fragment {
                 serverStateText.setText(getString(R.string.status_stop));
             }
         });
-        statusHandler.postDelayed(reconnectRunnable, 5000);
     }
 
     private void connectMetrics() {
