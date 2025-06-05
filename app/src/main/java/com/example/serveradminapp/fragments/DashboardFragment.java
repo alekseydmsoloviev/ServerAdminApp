@@ -80,8 +80,10 @@ public class DashboardFragment extends Fragment {
 
     @Override
     public void onDestroyView() {
+        statusHandler.removeCallbacks(statusTimeout);
         statusHandler.removeCallbacks(reconnectRunnable);
         if (metricsSocket != null) metricsSocket.cancel();
+        metricsSocket = null;
         super.onDestroyView();
     }
 
@@ -138,13 +140,21 @@ public class DashboardFragment extends Fragment {
     private void setStatusWork() {
         statusHandler.removeCallbacks(statusTimeout);
         statusHandler.removeCallbacks(reconnectRunnable);
-        statusHandler.post(() -> serverStateText.setText(getString(R.string.status_work)));
+        statusHandler.post(() -> {
+            if (isAdded()) {
+                serverStateText.setText(getString(R.string.status_work));
+            }
+        });
         statusHandler.postDelayed(statusTimeout, 15000);
     }
 
     private void setStatusStop() {
         statusHandler.removeCallbacks(statusTimeout);
-        statusHandler.post(() -> serverStateText.setText(getString(R.string.status_stop)));
+        statusHandler.post(() -> {
+            if (isAdded()) {
+                serverStateText.setText(getString(R.string.status_stop));
+            }
+        });
         statusHandler.postDelayed(reconnectRunnable, 5000);
     }
 
