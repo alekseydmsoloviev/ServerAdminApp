@@ -31,7 +31,6 @@ public class GaugeView extends View {
         init();
     }
 
-
     public GaugeView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
         init();
@@ -54,7 +53,6 @@ public class GaugeView extends View {
     }
 
     @Override
-
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         int size = Math.min(MeasureSpec.getSize(widthMeasureSpec), MeasureSpec.getSize(heightMeasureSpec));
         if (size == 0) {
@@ -64,7 +62,6 @@ public class GaugeView extends View {
     }
 
     @Override
-
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         int size = Math.min(getWidth(), getHeight());

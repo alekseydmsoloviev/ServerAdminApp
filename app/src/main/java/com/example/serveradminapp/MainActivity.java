@@ -143,6 +143,9 @@ public class MainActivity extends AppCompatActivity {
             metricsSocket = null;
         }
         metricsSocket = ServerApi.get().connectMetrics(metricsListener);
+        if (metricsSocket == null) {
+            setStatusStop();
+        }
     }
 
 
