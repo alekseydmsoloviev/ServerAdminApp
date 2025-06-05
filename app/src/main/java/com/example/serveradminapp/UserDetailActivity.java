@@ -73,9 +73,11 @@ public class UserDetailActivity extends AppCompatActivity {
         totalView = findViewById(R.id.detail_total);
         Button editButton = findViewById(R.id.detail_edit);
         Button deleteButton = findViewById(R.id.detail_delete);
+        View backButton = findViewById(R.id.back_button);
 
         editButton.setOnClickListener(v -> showEditDialog());
         deleteButton.setOnClickListener(v -> confirmDelete());
+        backButton.setOnClickListener(v -> finish());
 
         loadUser();
         connectWs();

@@ -54,6 +54,7 @@ public class ChatsActivity extends AppCompatActivity {
         ListView listView = findViewById(R.id.chats_list);
         Spinner sortSpinner = findViewById(R.id.sort_spinner);
         View refreshButton = findViewById(R.id.refresh_button);
+        View backButton = findViewById(R.id.back_button);
 
         adapter = new ChatAdapter();
         listView.setAdapter(adapter);
@@ -77,6 +78,7 @@ public class ChatsActivity extends AppCompatActivity {
         });
 
         refreshButton.setOnClickListener(v -> loadChats());
+        backButton.setOnClickListener(v -> finish());
 
         listView.setOnItemClickListener((p,v,pos,id)->{
             JSONObject obj = chatList.get(pos);
