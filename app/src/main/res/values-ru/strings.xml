@@ -8,7 +8,9 @@
     <string name="add_user">Добавить пользователя</string>
     <string name="install">Установить</string>
     <string name="port">Порт</string>
+    <string name="port_label">Порт:</string>
     <string name="daily_limit">Дневной лимит</string>
+    <string name="daily_limit_label">Лимит:</string>
     <string name="save">Сохранить</string>
     <string name="restart_server">Перезапустить сервер</string>
     <string name="model">модель</string>

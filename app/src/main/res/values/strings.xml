@@ -8,7 +8,9 @@
     <string name="add_user">Add User</string>
     <string name="install">Install</string>
     <string name="port">Port</string>
+    <string name="port_label">Port:</string>
     <string name="daily_limit">Daily limit</string>
+    <string name="daily_limit_label">Limit:</string>
     <string name="save">Save</string>
     <string name="restart_server">Restart Server</string>
     <string name="model">model</string>
