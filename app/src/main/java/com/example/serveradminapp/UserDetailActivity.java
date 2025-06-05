@@ -56,9 +56,6 @@ public class UserDetailActivity extends AppCompatActivity {
         }
         setContentView(R.layout.activity_user_detail);
 
-        View backButton = findViewById(R.id.back_button);
-        backButton.setOnClickListener(v -> finish());
-
         username = getIntent().getStringExtra("username");
         if (username == null) {
             finish();
