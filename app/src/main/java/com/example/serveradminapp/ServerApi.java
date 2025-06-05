@@ -37,6 +37,10 @@ public class ServerApi {
     private final String authHeader;
     private final OkHttpClient client = new OkHttpClient();
 
+    private WebSocket metricsSocket;
+    private boolean metricsOpen = false;
+    private final ForwardingWebSocketListener metricsForwarder;
+
     private ServerApi(String baseUrl, String username, String password) {
         String url = baseUrl;
         if (!url.startsWith("http")) {
@@ -50,6 +54,7 @@ public class ServerApi {
         this.baseUrl = url;
         String creds = username + ":" + password;
         this.authHeader = "Basic " + Base64.encodeToString(creds.getBytes(StandardCharsets.UTF_8), Base64.NO_WRAP);
+        this.metricsForwarder = new ForwardingWebSocketListener(this);
     }
 
     public static void init(String baseUrl, String username, String password) {
@@ -231,5 +236,66 @@ public class ServerApi {
             result[i] = array.getString(i);
         }
         return result;
+    }
+
+    /** Listener that forwards all events to a delegate. */
+    private static class ForwardingWebSocketListener extends WebSocketListener {
+        private volatile WebSocketListener delegate;
+        private final ServerApi api;
+
+        ForwardingWebSocketListener(ServerApi api) {
+            this.api = api;
+        }
+
+        public void setDelegate(WebSocketListener delegate) {
+            this.delegate = delegate;
+        }
+
+        @Override
+        public void onOpen(@NonNull WebSocket webSocket, @NonNull Response response) {
+            api.metricsOpen = true;
+            if (delegate != null) delegate.onOpen(webSocket, response);
+        }
+
+        @Override
+        public void onClosed(@NonNull WebSocket webSocket, int code, @NonNull String reason) {
+            api.metricsOpen = false;
+            if (delegate != null) delegate.onClosed(webSocket, code, reason);
+        }
+
+        @Override
+        public void onFailure(@NonNull WebSocket webSocket, @NonNull Throwable t, Response response) {
+            api.metricsOpen = false;
+            if (delegate != null) delegate.onFailure(webSocket, t, response);
+        }
+
+        @Override
+        public void onMessage(@NonNull WebSocket webSocket, @NonNull String text) {
+            if (delegate != null) delegate.onMessage(webSocket, text);
+        }
+    }
+
+    /** Start the persistent metrics WebSocket if not already connected. */
+    public synchronized void startMetricsSocket() {
+        if (metricsSocket != null) return;
+        metricsSocket = connectMetrics(metricsForwarder);
+    }
+
+    /** Close the persistent metrics WebSocket. */
+    public synchronized void stopMetricsSocket() {
+        if (metricsSocket != null) {
+            metricsSocket.cancel();
+            metricsSocket = null;
+            metricsOpen = false;
+        }
+    }
+
+    /** Set the listener to receive metrics events. */
+    public void setMetricsListener(WebSocketListener listener) {
+        metricsForwarder.setDelegate(listener);
+    }
+
+    public boolean isMetricsOpen() {
+        return metricsOpen;
     }
 }

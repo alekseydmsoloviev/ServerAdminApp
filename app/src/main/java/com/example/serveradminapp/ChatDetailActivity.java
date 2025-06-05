@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.widget.TextView;
 import android.view.View;
 import android.content.Context;
+import android.text.Html;
+import android.text.Spanned;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -94,7 +96,7 @@ public class ChatDetailActivity extends AppCompatActivity {
                     final String title = pageTitle;
                     runOnUiThread(() -> {
                         setTitle(title);
-                        view.setText(text);
+                        view.setText(markdownToSpanned(text));
                     });
                 } catch (JSONException ex) {
                     runOnUiThread(() -> view.setText(getString(R.string.error)));
@@ -103,4 +105,15 @@ public class ChatDetailActivity extends AppCompatActivity {
         });
     }
 
+    private Spanned markdownToSpanned(String md) {
+        String html = md
+                .replace("&", "&amp;")
+                .replace("<", "&lt;")
+                .replace(">", "&gt;");
+        html = html.replaceAll("\\*\\*(.+?)\\*\\*", "<b>$1</b>");
+        html = html.replaceAll("\\*(.+?)\\*", "<i>$1</i>");
+        html = html.replaceAll("`(.+?)`", "<tt>$1</tt>");
+        html = html.replace("\n", "<br>");
+        return Html.fromHtml(html, Html.FROM_HTML_MODE_LEGACY);
+    }
 }
