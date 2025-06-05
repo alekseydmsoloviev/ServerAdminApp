@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
 import android.content.SharedPreferences;
+import android.view.View;
 
 import androidx.annotation.NonNull;
 import java.io.IOException;
@@ -20,6 +21,8 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        View backButton = findViewById(R.id.back_button);
+        backButton.setOnClickListener(v -> finish());
 
         usernameEdit = findViewById(R.id.username_edit);
         passwordEdit = findViewById(R.id.password_edit);

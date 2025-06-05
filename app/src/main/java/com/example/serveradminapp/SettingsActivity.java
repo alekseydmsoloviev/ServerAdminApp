@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.content.Intent;
 import android.widget.Button;
 import android.widget.EditText;
+import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -27,6 +28,8 @@ public class SettingsActivity extends AppCompatActivity {
             return;
         }
         setContentView(R.layout.activity_settings);
+        View backButton = findViewById(R.id.back_button);
+        backButton.setOnClickListener(v -> finish());
         EditText portEdit = findViewById(R.id.port_edit);
         EditText limitEdit = findViewById(R.id.limit_edit);
         Button saveButton = findViewById(R.id.save_button);
