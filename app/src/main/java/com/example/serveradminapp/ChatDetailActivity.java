@@ -4,8 +4,9 @@ import android.os.Bundle;
 import android.content.Intent;
 import android.widget.TextView;
 import android.view.View;
-import android.text.TextUtils;
-import androidx.core.text.HtmlCompat;
+import android.content.Context;
+import android.text.Html;
+import android.text.Spanned;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -92,8 +93,7 @@ public class ChatDetailActivity extends AppCompatActivity {
                         sb.append(getString(R.string.no_messages));
                     }
 
-                    final CharSequence text = HtmlCompat.fromHtml(sb.toString(),
-                            HtmlCompat.FROM_HTML_MODE_LEGACY);
+                    final String text = sb.toString();
 
                     final String title = pageTitle;
                     runOnUiThread(() -> {
@@ -108,14 +108,22 @@ public class ChatDetailActivity extends AppCompatActivity {
     }
 
     private Spanned markdownToSpanned(String md) {
-        String html = md
-                .replace("&", "&amp;")
-                .replace("<", "&lt;")
-                .replace(">", "&gt;");
+        String html = Html.escapeHtml(md);
+
         html = html.replaceAll("\\*\\*(.+?)\\*\\*", "<b>$1</b>");
-        html = html.replaceAll("\\*(.+?)\\*", "<i>$1</i>");
+        html = html.replaceAll("__(.+?)__", "<b>$1</b>");
+
+        html = html.replaceAll("~~(.+?)~~", "<strike>$1</strike>");
+
+        html = html.replaceAll("(?<!\\*)\\*(.+?)\\*(?!\\*)", "<i>$1</i>");
+        html = html.replaceAll("(?<!_)_(.+?)_(?!_)", "<i>$1</i>");
+
         html = html.replaceAll("`(.+?)`", "<tt>$1</tt>");
+
+        html = html.replaceAll("(?m)^[\\*-]\\s+(.+)$", "&#8226; $1");
+
         html = html.replace("\n", "<br>");
+
         return Html.fromHtml(html, Html.FROM_HTML_MODE_LEGACY);
     }
 
