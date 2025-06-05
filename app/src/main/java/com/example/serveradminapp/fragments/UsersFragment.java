@@ -92,8 +92,10 @@ public class UsersFragment extends Fragment {
         ServerApi.get().listUsers(new okhttp3.Callback() {
             @Override
             public void onFailure(@NonNull okhttp3.Call call, @NonNull IOException e) {
-                requireActivity().runOnUiThread(() ->
-                        android.widget.Toast.makeText(requireContext(), getString(R.string.failed_load_users), android.widget.Toast.LENGTH_SHORT).show());
+                if (isAdded()) {
+                    requireActivity().runOnUiThread(() ->
+                            android.widget.Toast.makeText(requireContext(), getString(R.string.failed_load_users), android.widget.Toast.LENGTH_SHORT).show());
+                }
             }
 
             @Override
@@ -116,7 +118,9 @@ public class UsersFragment extends Fragment {
                             userList.add(String.valueOf(item));
                         }
                     }
-                    requireActivity().runOnUiThread(() -> adapter.notifyDataSetChanged());
+                    if (isAdded()) {
+                        requireActivity().runOnUiThread(() -> adapter.notifyDataSetChanged());
+                    }
                 } catch (JSONException ex) {
                     onFailure(call, new IOException(ex));
                 }
@@ -142,11 +146,13 @@ public class UsersFragment extends Fragment {
                             JSONObject u = users.getJSONObject(i);
                             list.add(u.optString("username"));
                         }
-                        requireActivity().runOnUiThread(() -> {
-                            userList.clear();
-                            userList.addAll(list);
-                            adapter.notifyDataSetChanged();
-                        });
+                        if (isAdded()) {
+                            requireActivity().runOnUiThread(() -> {
+                                userList.clear();
+                                userList.addAll(list);
+                                adapter.notifyDataSetChanged();
+                            });
+                        }
                     }
                 } catch (JSONException ignore) {}
             }
@@ -184,8 +190,10 @@ public class UsersFragment extends Fragment {
             ServerApi.get().createUser(body, new okhttp3.Callback() {
                 @Override
                 public void onFailure(@NonNull okhttp3.Call call, @NonNull IOException e) {
-                    requireActivity().runOnUiThread(() ->
-                            android.widget.Toast.makeText(requireContext(), getString(R.string.failed), android.widget.Toast.LENGTH_SHORT).show());
+                    if (isAdded()) {
+                        requireActivity().runOnUiThread(() ->
+                                android.widget.Toast.makeText(requireContext(), getString(R.string.failed), android.widget.Toast.LENGTH_SHORT).show());
+                    }
                 }
 
                 @Override
@@ -203,8 +211,10 @@ public class UsersFragment extends Fragment {
         ServerApi.get().deleteUser(username, new okhttp3.Callback() {
             @Override
             public void onFailure(@NonNull okhttp3.Call call, @NonNull IOException e) {
-                requireActivity().runOnUiThread(() ->
-                        android.widget.Toast.makeText(requireContext(), getString(R.string.failed), android.widget.Toast.LENGTH_SHORT).show());
+                if (isAdded()) {
+                    requireActivity().runOnUiThread(() ->
+                            android.widget.Toast.makeText(requireContext(), getString(R.string.failed), android.widget.Toast.LENGTH_SHORT).show());
+                }
             }
 
             @Override

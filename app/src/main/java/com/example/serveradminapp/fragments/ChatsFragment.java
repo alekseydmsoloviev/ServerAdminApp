@@ -105,10 +105,12 @@ public class ChatsFragment extends Fragment {
         ServerApi.get().listSessions(new okhttp3.Callback() {
             @Override
             public void onFailure(@NonNull okhttp3.Call call, @NonNull IOException e) {
-                requireActivity().runOnUiThread(() -> {
-                    chatList.clear();
-                    adapter.notifyDataSetChanged();
-                });
+                if (isAdded()) {
+                    requireActivity().runOnUiThread(() -> {
+                        chatList.clear();
+                        adapter.notifyDataSetChanged();
+                    });
+                }
             }
 
             @Override
@@ -122,7 +124,9 @@ public class ChatsFragment extends Fragment {
                     for (int i=0;i<arr.length();i++) {
                         chatList.add(arr.getJSONObject(i));
                     }
-                    requireActivity().runOnUiThread(() -> sortAndUpdate());
+                    if (isAdded()) {
+                        requireActivity().runOnUiThread(() -> sortAndUpdate());
+                    }
                 } catch (JSONException ex) {
                     // ignore
                 }
@@ -178,7 +182,7 @@ public class ChatsFragment extends Fragment {
                     @Override public void onFailure(@NonNull okhttp3.Call call, @NonNull IOException e) {}
                     @Override public void onResponse(@NonNull okhttp3.Call call, @NonNull okhttp3.Response response) throws IOException {
                         response.close();
-                        if (response.isSuccessful()) {
+                        if (response.isSuccessful() && isAdded()) {
                             requireActivity().runOnUiThread(() -> {
                                 chatList.remove(obj);
                                 notifyDataSetChanged();
