@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.content.res.Resources;
-import android.content.Intent;
 
 import java.util.Locale;
 
@@ -47,11 +46,15 @@ public class LocaleUtil {
         return context;
     }
 
-    /** Restart the given activity to apply configuration changes safely.
-     *  Any active metrics WebSocket is closed so it can be recreated. */
+    /**
+     * Restart the given activity to apply configuration changes without
+     * interrupting the persistent metrics WebSocket connection. Using
+     * {@link Activity#recreate()} triggers a configuration change so the
+     * activity is restarted but {@link Activity#isFinishing()} remains
+     * {@code false}. This prevents {@link MainActivity#onDestroy()} from
+     * closing the WebSocket, keeping it alive during language switches.
+     */
     public static void restart(Activity activity) {
-        Intent intent = activity.getIntent();
-        activity.finish();
-        activity.startActivity(intent);
+        activity.recreate();
     }
 }
