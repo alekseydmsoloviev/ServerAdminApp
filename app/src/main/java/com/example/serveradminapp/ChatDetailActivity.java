@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.widget.TextView;
 import android.widget.Button;
 import android.text.TextUtils;
+import android.view.View;
 import androidx.core.text.HtmlCompat;
 
 import androidx.annotation.NonNull;
@@ -22,6 +23,7 @@ public class ChatDetailActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        LocaleUtil.apply(this);
         super.onCreate(savedInstanceState);
         ServerApi.restore(this);
         if (ServerApi.get() == null) {
@@ -30,6 +32,8 @@ public class ChatDetailActivity extends AppCompatActivity {
             return;
         }
         setContentView(R.layout.activity_chat_detail);
+        View backButton = findViewById(R.id.back_button);
+        backButton.setOnClickListener(v -> finish());
 
         sessionId = getIntent().getStringExtra("session_id");
         if (sessionId == null) {
@@ -40,7 +44,7 @@ public class ChatDetailActivity extends AppCompatActivity {
         TextView messagesView = findViewById(R.id.messages_text);
         messagesView.setText(R.string.loading);
 
-        Button refreshButton = findViewById(R.id.refresh_button);
+        View refreshButton = findViewById(R.id.refresh_button);
         refreshButton.setOnClickListener(v -> loadMessages(sessionId, messagesView));
 
         loadMessages(sessionId, messagesView);
@@ -50,7 +54,7 @@ public class ChatDetailActivity extends AppCompatActivity {
         ServerApi.get().getSession(id, new okhttp3.Callback() {
             @Override
             public void onFailure(@NonNull okhttp3.Call call, @NonNull IOException e) {
-                runOnUiThread(() -> view.setText("Failed"));
+                runOnUiThread(() -> view.setText(getString(R.string.failed)));
             }
 
             @Override
@@ -58,7 +62,7 @@ public class ChatDetailActivity extends AppCompatActivity {
 
                 if (!response.isSuccessful()) {
                     response.close();
-                    runOnUiThread(() -> view.setText("Error " + response.code()));
+                    runOnUiThread(() -> view.setText(getString(R.string.error) + " " + response.code()));
                     return;
                 }
 
@@ -88,7 +92,7 @@ public class ChatDetailActivity extends AppCompatActivity {
                         view.setText(text);
                     });
                 } catch (JSONException ex) {
-                    runOnUiThread(() -> view.setText("Error"));
+                    runOnUiThread(() -> view.setText(getString(R.string.error)));
                 }
             }
         });

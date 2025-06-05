@@ -9,6 +9,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.LinearLayout;
+import android.view.View;
 import java.util.ArrayList;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -29,6 +30,7 @@ public class UsersActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        LocaleUtil.apply(this);
         super.onCreate(savedInstanceState);
         ServerApi.restore(this);
         if (ServerApi.get() == null) {
@@ -37,6 +39,9 @@ public class UsersActivity extends AppCompatActivity {
             return;
         }
         setContentView(R.layout.activity_users);
+
+        View backButton = findViewById(R.id.back_button);
+        backButton.setOnClickListener(v -> finish());
 
         listView = findViewById(R.id.users_list);
         Button addButton = findViewById(R.id.add_user_button);
@@ -49,9 +54,9 @@ public class UsersActivity extends AppCompatActivity {
         listView.setOnItemLongClickListener((parent, view, position, id) -> {
             String username = userList.get(position);
             new AlertDialog.Builder(this)
-                    .setMessage("Delete user " + username + "?")
-                    .setPositiveButton("Delete", (d,w)->deleteUser(username))
-                    .setNegativeButton("Cancel", null)
+                    .setMessage(getString(R.string.delete_user_q, username))
+                    .setPositiveButton(getString(R.string.delete), (d,w)->deleteUser(username))
+                    .setNegativeButton(android.R.string.cancel, null)
                     .show();
             return true;
         });
@@ -67,7 +72,7 @@ public class UsersActivity extends AppCompatActivity {
         ServerApi.get().listUsers(new okhttp3.Callback() {
             @Override
             public void onFailure(@NonNull okhttp3.Call call, @NonNull IOException e) {
-                runOnUiThread(() -> android.widget.Toast.makeText(UsersActivity.this, "Failed to load users", android.widget.Toast.LENGTH_SHORT).show());
+                runOnUiThread(() -> android.widget.Toast.makeText(UsersActivity.this, getString(R.string.failed_load_users), android.widget.Toast.LENGTH_SHORT).show());
             }
 
             @Override
@@ -152,21 +157,21 @@ public class UsersActivity extends AppCompatActivity {
         layout.addView(passEdit);
         layout.addView(limitEdit);
         builder.setView(layout);
-        builder.setPositiveButton("Save", (dialog, which) -> {
+        builder.setPositiveButton(getString(R.string.save), (dialog, which) -> {
             JSONObject obj = new JSONObject();
             try {
                 obj.put("username", nameEdit.getText().toString().trim());
                 obj.put("password", passEdit.getText().toString());
                 obj.put("daily_limit", Integer.parseInt(limitEdit.getText().toString().trim()));
             } catch (Exception e) {
-                android.widget.Toast.makeText(this, "Invalid input", android.widget.Toast.LENGTH_SHORT).show();
+                android.widget.Toast.makeText(this, getString(R.string.invalid_input), android.widget.Toast.LENGTH_SHORT).show();
                 return;
             }
             RequestBody body = RequestBody.create(obj.toString(), okhttp3.MediaType.get("application/json"));
             ServerApi.get().createUser(body, new okhttp3.Callback() {
                 @Override
                 public void onFailure(@NonNull okhttp3.Call call, @NonNull IOException e) {
-                    runOnUiThread(() -> android.widget.Toast.makeText(UsersActivity.this, "Failed", android.widget.Toast.LENGTH_SHORT).show());
+                    runOnUiThread(() -> android.widget.Toast.makeText(UsersActivity.this, getString(R.string.failed), android.widget.Toast.LENGTH_SHORT).show());
                 }
 
                 @Override
@@ -176,7 +181,7 @@ public class UsersActivity extends AppCompatActivity {
                 }
             });
         });
-        builder.setNegativeButton("Cancel", null);
+        builder.setNegativeButton(android.R.string.cancel, null);
         builder.show();
     }
 
@@ -184,7 +189,7 @@ public class UsersActivity extends AppCompatActivity {
         ServerApi.get().deleteUser(username, new okhttp3.Callback() {
             @Override
             public void onFailure(@NonNull okhttp3.Call call, @NonNull IOException e) {
-                runOnUiThread(() -> android.widget.Toast.makeText(UsersActivity.this, "Failed", android.widget.Toast.LENGTH_SHORT).show());
+                runOnUiThread(() -> android.widget.Toast.makeText(UsersActivity.this, getString(R.string.failed), android.widget.Toast.LENGTH_SHORT).show());
             }
 
             @Override
