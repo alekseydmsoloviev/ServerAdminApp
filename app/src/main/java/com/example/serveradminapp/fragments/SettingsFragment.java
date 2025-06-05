@@ -87,8 +87,10 @@ public class SettingsFragment extends Fragment {
         ServerApi.get().loadConfig(new okhttp3.Callback() {
             @Override
             public void onFailure(@NonNull okhttp3.Call call, @NonNull IOException e) {
-                requireActivity().runOnUiThread(() ->
-                        android.widget.Toast.makeText(requireContext(), getString(R.string.failed_load), android.widget.Toast.LENGTH_SHORT).show());
+                if (isAdded()) {
+                    requireActivity().runOnUiThread(() ->
+                            android.widget.Toast.makeText(requireContext(), getString(R.string.failed_load), android.widget.Toast.LENGTH_SHORT).show());
+                }
             }
 
             @Override
@@ -102,10 +104,12 @@ public class SettingsFragment extends Fragment {
                 response.close();
                 try {
                     JSONObject obj = new JSONObject(body);
-                    requireActivity().runOnUiThread(() -> {
-                        portEdit.setText(obj.optString("port"));
-                        limitEdit.setText(obj.optString("daily_limit"));
-                    });
+                    if (isAdded()) {
+                        requireActivity().runOnUiThread(() -> {
+                            portEdit.setText(obj.optString("port"));
+                            limitEdit.setText(obj.optString("daily_limit"));
+                        });
+                    }
                 } catch (JSONException ex) {
                     onFailure(call, new IOException(ex));
                 }
@@ -126,15 +130,19 @@ public class SettingsFragment extends Fragment {
         ServerApi.get().updateConfig(body, new okhttp3.Callback() {
             @Override
             public void onFailure(@NonNull okhttp3.Call call, @NonNull IOException e) {
-                requireActivity().runOnUiThread(() ->
-                        android.widget.Toast.makeText(requireContext(), getString(R.string.failed), android.widget.Toast.LENGTH_SHORT).show());
+                if (isAdded()) {
+                    requireActivity().runOnUiThread(() ->
+                            android.widget.Toast.makeText(requireContext(), getString(R.string.failed), android.widget.Toast.LENGTH_SHORT).show());
+                }
             }
 
             @Override
             public void onResponse(@NonNull okhttp3.Call call, @NonNull okhttp3.Response response) throws IOException {
                 response.close();
-                requireActivity().runOnUiThread(() ->
-                        android.widget.Toast.makeText(requireContext(), response.isSuccessful() ? getString(R.string.saved) : getString(R.string.error), android.widget.Toast.LENGTH_SHORT).show());
+                if (isAdded()) {
+                    requireActivity().runOnUiThread(() ->
+                            android.widget.Toast.makeText(requireContext(), response.isSuccessful() ? getString(R.string.saved) : getString(R.string.error), android.widget.Toast.LENGTH_SHORT).show());
+                }
             }
         });
     }
@@ -143,15 +151,19 @@ public class SettingsFragment extends Fragment {
         ServerApi.get().restartServer(new okhttp3.Callback() {
             @Override
             public void onFailure(@NonNull okhttp3.Call call, @NonNull IOException e) {
-                requireActivity().runOnUiThread(() ->
-                        android.widget.Toast.makeText(requireContext(), getString(R.string.failed), android.widget.Toast.LENGTH_SHORT).show());
+                if (isAdded()) {
+                    requireActivity().runOnUiThread(() ->
+                            android.widget.Toast.makeText(requireContext(), getString(R.string.failed), android.widget.Toast.LENGTH_SHORT).show());
+                }
             }
 
             @Override
             public void onResponse(@NonNull okhttp3.Call call, @NonNull okhttp3.Response response) throws IOException {
                 response.close();
-                requireActivity().runOnUiThread(() ->
-                        android.widget.Toast.makeText(requireContext(), getString(R.string.restarting), android.widget.Toast.LENGTH_SHORT).show());
+                if (isAdded()) {
+                    requireActivity().runOnUiThread(() ->
+                            android.widget.Toast.makeText(requireContext(), getString(R.string.restarting), android.widget.Toast.LENGTH_SHORT).show());
+                }
             }
         });
     }

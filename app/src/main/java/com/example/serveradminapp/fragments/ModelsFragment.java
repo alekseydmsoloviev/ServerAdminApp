@@ -104,8 +104,10 @@ public class ModelsFragment extends Fragment {
         ServerApi.get().listModels(new okhttp3.Callback() {
             @Override
             public void onFailure(@NonNull okhttp3.Call call, @NonNull IOException e) {
-                requireActivity().runOnUiThread(() ->
-                        android.widget.Toast.makeText(requireContext(), getString(R.string.failed_load), android.widget.Toast.LENGTH_SHORT).show());
+                if (isAdded()) {
+                    requireActivity().runOnUiThread(() ->
+                            android.widget.Toast.makeText(requireContext(), getString(R.string.failed_load), android.widget.Toast.LENGTH_SHORT).show());
+                }
             }
 
             @Override
@@ -123,7 +125,9 @@ public class ModelsFragment extends Fragment {
                     for (int i = 0; i < array.length(); i++) {
                         modelList.add(array.getString(i));
                     }
-                    requireActivity().runOnUiThread(() -> adapter.notifyDataSetChanged());
+                    if (isAdded()) {
+                        requireActivity().runOnUiThread(() -> adapter.notifyDataSetChanged());
+                    }
                 } catch (JSONException ex) {
                     onFailure(call, new IOException(ex));
                 }
@@ -135,8 +139,10 @@ public class ModelsFragment extends Fragment {
         ServerApi.get().availableModels(new okhttp3.Callback() {
             @Override
             public void onFailure(@NonNull okhttp3.Call call, @NonNull IOException e) {
-                requireActivity().runOnUiThread(() ->
-                        android.widget.Toast.makeText(requireContext(), getString(R.string.failed), android.widget.Toast.LENGTH_SHORT).show());
+                if (isAdded()) {
+                    requireActivity().runOnUiThread(() ->
+                            android.widget.Toast.makeText(requireContext(), getString(R.string.failed), android.widget.Toast.LENGTH_SHORT).show());
+                }
             }
 
             @Override
@@ -154,7 +160,9 @@ public class ModelsFragment extends Fragment {
                     for (int i = 0; i < arr.length(); i++) {
                         availableList.add(arr.getString(i));
                     }
-                    requireActivity().runOnUiThread(() -> availableAdapter.notifyDataSetChanged());
+                    if (isAdded()) {
+                        requireActivity().runOnUiThread(() -> availableAdapter.notifyDataSetChanged());
+                    }
                 } catch (JSONException ex) {
                     onFailure(call, new IOException(ex));
                 }
@@ -166,8 +174,10 @@ public class ModelsFragment extends Fragment {
         ServerApi.get().modelVariants(name, new okhttp3.Callback() {
             @Override
             public void onFailure(@NonNull okhttp3.Call call, @NonNull IOException e) {
-                requireActivity().runOnUiThread(() ->
-                        android.widget.Toast.makeText(requireContext(), getString(R.string.failed), android.widget.Toast.LENGTH_SHORT).show());
+                if (isAdded()) {
+                    requireActivity().runOnUiThread(() ->
+                            android.widget.Toast.makeText(requireContext(), getString(R.string.failed), android.widget.Toast.LENGTH_SHORT).show());
+                }
             }
 
             @Override
@@ -185,7 +195,9 @@ public class ModelsFragment extends Fragment {
                     for (int i = 0; i < arr.length(); i++) {
                         variantList.add(arr.getString(i));
                     }
-                    requireActivity().runOnUiThread(() -> variantAdapter.notifyDataSetChanged());
+                    if (isAdded()) {
+                        requireActivity().runOnUiThread(() -> variantAdapter.notifyDataSetChanged());
+                    }
                 } catch (JSONException ex) {
                     onFailure(call, new IOException(ex));
                 }
@@ -225,14 +237,18 @@ public class ModelsFragment extends Fragment {
                             if ("success".equals(parsed)) {
                                 String name = installingVariant;
                                 installingVariant = null;
-                                requireActivity().runOnUiThread(() -> {
-                                    progressText.setText("");
-                                    android.widget.Toast.makeText(requireContext(),
-                                            "модель " + name + " успешно установлена",
-                                            android.widget.Toast.LENGTH_SHORT).show();
-                                });
+                                if (isAdded()) {
+                                    requireActivity().runOnUiThread(() -> {
+                                        progressText.setText("");
+                                        android.widget.Toast.makeText(requireContext(),
+                                                "модель " + name + " успешно установлена",
+                                                android.widget.Toast.LENGTH_SHORT).show();
+                                    });
+                                }
                             } else {
-                                requireActivity().runOnUiThread(() -> progressText.setText(parsed));
+                                if (isAdded()) {
+                                    requireActivity().runOnUiThread(() -> progressText.setText(parsed));
+                                }
                             }
                         }
                     } else if (obj.has("models")) {
@@ -241,16 +257,20 @@ public class ModelsFragment extends Fragment {
                         for (int i = 0; i < arr.length(); i++) {
                             modelList.add(arr.getString(i));
                         }
-                        requireActivity().runOnUiThread(() -> adapter.notifyDataSetChanged());
+                        if (isAdded()) {
+                            requireActivity().runOnUiThread(() -> adapter.notifyDataSetChanged());
+                        }
                         if (installingVariant != null) {
                             for (int i = 0; i < arr.length(); i++) {
                                 if (installingVariant.equals(arr.getString(i))) {
                                     final String name = installingVariant;
                                     installingVariant = null;
-                                    requireActivity().runOnUiThread(() -> android.widget.Toast.makeText(
-                                            requireContext(),
-                                            "модель " + name + " успешно установлена",
-                                            android.widget.Toast.LENGTH_SHORT).show());
+                                    if (isAdded()) {
+                                        requireActivity().runOnUiThread(() -> android.widget.Toast.makeText(
+                                                requireContext(),
+                                                "модель " + name + " успешно установлена",
+                                                android.widget.Toast.LENGTH_SHORT).show());
+                                    }
                                     break;
                                 }
                             }
@@ -308,8 +328,10 @@ public class ModelsFragment extends Fragment {
         ServerApi.get().deleteModel(name, new okhttp3.Callback() {
             @Override
             public void onFailure(@NonNull okhttp3.Call call, @NonNull IOException e) {
-                requireActivity().runOnUiThread(() ->
-                        android.widget.Toast.makeText(requireContext(), getString(R.string.error), android.widget.Toast.LENGTH_SHORT).show());
+                if (isAdded()) {
+                    requireActivity().runOnUiThread(() ->
+                            android.widget.Toast.makeText(requireContext(), getString(R.string.error), android.widget.Toast.LENGTH_SHORT).show());
+                }
             }
 
             @Override

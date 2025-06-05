@@ -111,16 +111,18 @@ public class DashboardFragment extends Fragment {
                     final int net = (int) Math.round(obj.optDouble("network"));
                     final int disk = (int) Math.round(obj.optDouble("disk"));
                     setStatusWork();
-                    requireActivity().runOnUiThread(() -> {
-                        if (day > 0)
-                            messages24hText.setText(getString(R.string.messages_24h_value, day));
-                        if (total > 0)
-                            messagesTotalText.setText(getString(R.string.messages_total_value, total));
-                        cpuGauge.setPercent(cpu);
-                        memGauge.setPercent(mem);
-                        netGauge.setPercent(net);
-                        diskGauge.setPercent(disk);
-                    });
+                    if (isAdded()) {
+                        requireActivity().runOnUiThread(() -> {
+                            if (day > 0)
+                                messages24hText.setText(getString(R.string.messages_24h_value, day));
+                            if (total > 0)
+                                messagesTotalText.setText(getString(R.string.messages_total_value, total));
+                            cpuGauge.setPercent(cpu);
+                            memGauge.setPercent(mem);
+                            netGauge.setPercent(net);
+                            diskGauge.setPercent(disk);
+                        });
+                    }
                 } else if (obj.has("snapshot")) {
                     JSONObject snap = obj.getJSONObject("snapshot");
                     updateUsageFromJson(snap);
@@ -162,10 +164,12 @@ public class DashboardFragment extends Fragment {
         ServerApi.get().fetchUsage(new Callback() {
             @Override
             public void onFailure(@NonNull okhttp3.Call call, @NonNull IOException e) {
-                requireActivity().runOnUiThread(() -> {
-                    messages24hText.setText(R.string.messages_24h);
-                    messagesTotalText.setText(R.string.messages_total);
-                });
+                if (isAdded()) {
+                    requireActivity().runOnUiThread(() -> {
+                        messages24hText.setText(R.string.messages_24h);
+                        messagesTotalText.setText(R.string.messages_total);
+                    });
+                }
             }
 
             @Override
@@ -190,9 +194,11 @@ public class DashboardFragment extends Fragment {
         int totalCount = obj.optInt("total", dayCount);
         final int count24h = dayCount;
         final int countTotal = totalCount;
-        requireActivity().runOnUiThread(() -> {
-            messages24hText.setText(getString(R.string.messages_24h_value, count24h));
-            messagesTotalText.setText(getString(R.string.messages_total_value, countTotal));
-        });
+        if (isAdded()) {
+            requireActivity().runOnUiThread(() -> {
+                messages24hText.setText(getString(R.string.messages_24h_value, count24h));
+                messagesTotalText.setText(getString(R.string.messages_total_value, countTotal));
+            });
+        }
     }
 }

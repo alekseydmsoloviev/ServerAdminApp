@@ -82,7 +82,9 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        ServerApi.get().stopMetricsSocket();
+        if (isFinishing() && !isChangingConfigurations()) {
+            ServerApi.get().stopMetricsSocket();
+        }
         super.onDestroy();
     }
 }
