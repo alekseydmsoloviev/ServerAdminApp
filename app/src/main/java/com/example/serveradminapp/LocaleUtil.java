@@ -50,10 +50,6 @@ public class LocaleUtil {
     /** Restart the given activity to apply configuration changes safely.
      *  Any active metrics WebSocket is closed so it can be recreated. */
     public static void restart(Activity activity) {
-        ServerApi api = ServerApi.get();
-        if (api != null) {
-            api.stopMetricsSocket();
-        }
         Intent intent = activity.getIntent();
         activity.finish();
         activity.startActivity(intent);
