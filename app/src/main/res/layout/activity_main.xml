@@ -13,7 +13,8 @@
             android:id="@+id/server_state_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Stop"
+            android:text="Status: Stop"
+
             android:textSize="24sp"
             android:gravity="center" />
 
@@ -116,28 +117,51 @@
             </LinearLayout>
         </LinearLayout>
 
-        <Button
-            android:id="@+id/users_button"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Users" />
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/bottom_bar"
+            android:padding="8dp">
 
-        <Button
-            android:id="@+id/models_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Models" />
+            <ImageButton
+                android:id="@+id/users_button"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:src="@android:drawable/ic_menu_myplaces"
+                android:contentDescription="Users" />
 
-        <Button
-            android:id="@+id/chats_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Chats" />
+            <TextView
+                android:id="@+id/models_button"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="AI"
+                android:textStyle="bold"
+                android:textSize="18sp" />
 
-        <Button
-            android:id="@+id/settings_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Server Settings" />
+            <ImageButton
+                android:id="@+id/chats_button"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:src="@android:drawable/ic_menu_send"
+                android:contentDescription="Chats" />
+
+            <ImageButton
+                android:id="@+id/settings_button"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:src="@android:drawable/ic_menu_preferences"
+                android:contentDescription="Settings" />
+        </LinearLayout>
     </LinearLayout>
 </ScrollView>

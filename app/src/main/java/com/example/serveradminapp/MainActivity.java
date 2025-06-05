@@ -2,8 +2,11 @@ package com.example.serveradminapp;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.Button;
+import android.os.Handler;
+import android.os.Looper;
 import android.widget.TextView;
+import android.view.View;
+
 import com.example.serveradminapp.GaugeView;
 
 import androidx.annotation.NonNull;
@@ -27,6 +30,20 @@ public class MainActivity extends AppCompatActivity {
     private GaugeView netGauge;
     private GaugeView diskGauge;
 
+    private final Handler statusHandler = new Handler(Looper.getMainLooper());
+    private final Runnable statusTimeout = () -> serverStateText.setText("Status: Stop");
+
+    private void setStatusWork() {
+        statusHandler.removeCallbacks(statusTimeout);
+        statusHandler.post(() -> serverStateText.setText("Status: Work"));
+        statusHandler.postDelayed(statusTimeout, 15000);
+    }
+
+    private void setStatusStop() {
+        statusHandler.removeCallbacks(statusTimeout);
+        statusHandler.post(() -> serverStateText.setText("Status: Stop"));
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         serverStateText = findViewById(R.id.server_state_text);
-        serverStateText.setText("Stop");
+        serverStateText.setText("Status: Stop");
         messages24hText = findViewById(R.id.messages_24h_text);
         messagesTotalText = findViewById(R.id.messages_total_text);
         cpuGauge = findViewById(R.id.cpu_gauge);
@@ -47,10 +64,10 @@ public class MainActivity extends AppCompatActivity {
         netGauge = findViewById(R.id.net_gauge);
         diskGauge = findViewById(R.id.disk_gauge);
 
-        Button usersButton = findViewById(R.id.users_button);
-        Button modelsButton = findViewById(R.id.models_button);
-        Button chatsButton = findViewById(R.id.chats_button);
-        Button settingsButton = findViewById(R.id.settings_button);
+        View usersButton = findViewById(R.id.users_button);
+        View modelsButton = findViewById(R.id.models_button);
+        View chatsButton = findViewById(R.id.chats_button);
+        View settingsButton = findViewById(R.id.settings_button);
 
         usersButton.setOnClickListener(v ->
                 startActivity(new Intent(MainActivity.this, UsersActivity.class)));
@@ -75,17 +92,21 @@ public class MainActivity extends AppCompatActivity {
         ServerApi.get().connectMetrics(new WebSocketListener() {
             @Override
             public void onOpen(@NonNull WebSocket webSocket, @NonNull okhttp3.Response response) {
-                runOnUiThread(() -> serverStateText.setText("Work"));
+                setStatusWork();
+
             }
 
             @Override
             public void onClosed(@NonNull WebSocket webSocket, int code, @NonNull String reason) {
-                runOnUiThread(() -> serverStateText.setText("Stop"));
+
+                setStatusStop();
+
             }
 
             @Override
             public void onFailure(@NonNull WebSocket webSocket, @NonNull Throwable t, okhttp3.Response response) {
-                runOnUiThread(() -> serverStateText.setText("Stop"));
+                setStatusStop();
+
             }
             @Override
             public void onMessage(@NonNull WebSocket webSocket, @NonNull String text) {
@@ -99,8 +120,10 @@ public class MainActivity extends AppCompatActivity {
                         final int mem = (int) Math.round(obj.optDouble("memory"));
                         final int net = (int) Math.round(obj.optDouble("network"));
                         final int disk = (int) Math.round(obj.optDouble("disk"));
+
+                        setStatusWork();
                         runOnUiThread(() -> {
-                            serverStateText.setText("Work");
+
                             if (day > 0) messages24hText.setText("Messages last 24h: " + day);
                             if (total > 0) messagesTotalText.setText("Messages total: " + total);
                             cpuGauge.setPercent(cpu);
