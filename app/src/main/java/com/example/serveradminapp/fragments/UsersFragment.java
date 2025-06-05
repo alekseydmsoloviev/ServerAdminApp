@@ -1,65 +1,73 @@
-package com.example.serveradminapp;
+package com.example.serveradminapp.fragments;
 
-import android.os.Bundle;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.text.InputType;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.LinearLayout;
-import android.view.View;
-import android.content.Context;
-import java.util.ArrayList;
+import android.widget.ListView;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+
+import com.example.serveradminapp.LocaleUtil;
+import com.example.serveradminapp.R;
+import com.example.serveradminapp.ServerApi;
+import com.example.serveradminapp.UserDetailActivity;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.io.IOException;
-import okhttp3.RequestBody;
+import java.util.ArrayList;
+
 import okhttp3.MediaType;
+import okhttp3.RequestBody;
 
-
-public class UsersActivity extends AppCompatActivity {
+public class UsersFragment extends Fragment {
 
     private ListView listView;
     private ArrayAdapter<String> adapter;
-    private ArrayList<String> userList = new ArrayList<>();
+    private final ArrayList<String> userList = new ArrayList<>();
+    private okhttp3.WebSocket ws;
 
     @Override
-    protected void attachBaseContext(Context newBase) {
-        super.attachBaseContext(LocaleUtil.attach(newBase));
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        LocaleUtil.attach(context);
+        LocaleUtil.apply(requireActivity());
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.activity_users, container, false);
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        LocaleUtil.apply(this);
-        super.onCreate(savedInstanceState);
-        ServerApi.restore(this);
-        if (ServerApi.get() == null) {
-            startActivity(new Intent(this, LoginActivity.class));
-            finish();
-            return;
-        }
-        setContentView(R.layout.activity_users);
-
-        View backButton = findViewById(R.id.back_button);
-        backButton.setOnClickListener(v -> finish());
-
-        listView = findViewById(R.id.users_list);
-        Button addButton = findViewById(R.id.add_user_button);
-        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, userList);
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        listView = view.findViewById(R.id.users_list);
+        Button addButton = view.findViewById(R.id.add_user_button);
+        adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, userList);
         listView.setAdapter(adapter);
         loadUsers();
         connectWs();
 
         addButton.setOnClickListener(v -> showAddUserDialog());
-        listView.setOnItemLongClickListener((parent, view, position, id) -> {
+        listView.setOnItemLongClickListener((parent, itemView, position, id) -> {
             String username = userList.get(position);
-            new AlertDialog.Builder(this)
+            new AlertDialog.Builder(requireContext())
                     .setMessage(getString(R.string.delete_user_q, username))
                     .setPositiveButton(getString(R.string.delete), (d,w)->deleteUser(username))
                     .setNegativeButton(android.R.string.cancel, null)
@@ -68,17 +76,24 @@ public class UsersActivity extends AppCompatActivity {
         });
         listView.setOnItemClickListener((p,v,pos,id)->{
             String username = userList.get(pos);
-            Intent intent = new Intent(UsersActivity.this, UserDetailActivity.class);
+            Intent intent = new Intent(requireContext(), UserDetailActivity.class);
             intent.putExtra("username", username);
             startActivity(intent);
         });
+    }
+
+    @Override
+    public void onDestroyView() {
+        if (ws != null) ws.close(1000, null);
+        super.onDestroyView();
     }
 
     private void loadUsers() {
         ServerApi.get().listUsers(new okhttp3.Callback() {
             @Override
             public void onFailure(@NonNull okhttp3.Call call, @NonNull IOException e) {
-                runOnUiThread(() -> android.widget.Toast.makeText(UsersActivity.this, getString(R.string.failed_load_users), android.widget.Toast.LENGTH_SHORT).show());
+                requireActivity().runOnUiThread(() ->
+                        android.widget.Toast.makeText(requireContext(), getString(R.string.failed_load_users), android.widget.Toast.LENGTH_SHORT).show());
             }
 
             @Override
@@ -101,15 +116,13 @@ public class UsersActivity extends AppCompatActivity {
                             userList.add(String.valueOf(item));
                         }
                     }
-                    runOnUiThread(() -> adapter.notifyDataSetChanged());
+                    requireActivity().runOnUiThread(() -> adapter.notifyDataSetChanged());
                 } catch (JSONException ex) {
                     onFailure(call, new IOException(ex));
                 }
             }
         });
     }
-
-    private okhttp3.WebSocket ws;
 
     private void connectWs() {
         ws = ServerApi.get().connectMetrics(new okhttp3.WebSocketListener() {
@@ -129,7 +142,7 @@ public class UsersActivity extends AppCompatActivity {
                             JSONObject u = users.getJSONObject(i);
                             list.add(u.optString("username"));
                         }
-                        runOnUiThread(() -> {
+                        requireActivity().runOnUiThread(() -> {
                             userList.clear();
                             userList.addAll(list);
                             adapter.notifyDataSetChanged();
@@ -140,23 +153,17 @@ public class UsersActivity extends AppCompatActivity {
         });
     }
 
-    @Override
-    protected void onDestroy() {
-        if (ws != null) ws.close(1000, null);
-        super.onDestroy();
-    }
-
     private void showAddUserDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
         builder.setTitle("Add User");
-        LinearLayout layout = new LinearLayout(this);
+        LinearLayout layout = new LinearLayout(requireContext());
         layout.setOrientation(LinearLayout.VERTICAL);
-        EditText nameEdit = new EditText(this);
+        EditText nameEdit = new EditText(requireContext());
         nameEdit.setHint("Username");
-        EditText passEdit = new EditText(this);
+        EditText passEdit = new EditText(requireContext());
         passEdit.setHint("Password");
         passEdit.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        EditText limitEdit = new EditText(this);
+        EditText limitEdit = new EditText(requireContext());
         limitEdit.setHint("Daily limit");
         limitEdit.setInputType(InputType.TYPE_CLASS_NUMBER);
         layout.addView(nameEdit);
@@ -170,14 +177,15 @@ public class UsersActivity extends AppCompatActivity {
                 obj.put("password", passEdit.getText().toString());
                 obj.put("daily_limit", Integer.parseInt(limitEdit.getText().toString().trim()));
             } catch (Exception e) {
-                android.widget.Toast.makeText(this, getString(R.string.invalid_input), android.widget.Toast.LENGTH_SHORT).show();
+                android.widget.Toast.makeText(requireContext(), getString(R.string.invalid_input), android.widget.Toast.LENGTH_SHORT).show();
                 return;
             }
-            RequestBody body = RequestBody.create(obj.toString(), okhttp3.MediaType.get("application/json"));
+            RequestBody body = RequestBody.create(obj.toString(), MediaType.get("application/json"));
             ServerApi.get().createUser(body, new okhttp3.Callback() {
                 @Override
                 public void onFailure(@NonNull okhttp3.Call call, @NonNull IOException e) {
-                    runOnUiThread(() -> android.widget.Toast.makeText(UsersActivity.this, getString(R.string.failed), android.widget.Toast.LENGTH_SHORT).show());
+                    requireActivity().runOnUiThread(() ->
+                            android.widget.Toast.makeText(requireContext(), getString(R.string.failed), android.widget.Toast.LENGTH_SHORT).show());
                 }
 
                 @Override
@@ -195,7 +203,8 @@ public class UsersActivity extends AppCompatActivity {
         ServerApi.get().deleteUser(username, new okhttp3.Callback() {
             @Override
             public void onFailure(@NonNull okhttp3.Call call, @NonNull IOException e) {
-                runOnUiThread(() -> android.widget.Toast.makeText(UsersActivity.this, getString(R.string.failed), android.widget.Toast.LENGTH_SHORT).show());
+                requireActivity().runOnUiThread(() ->
+                        android.widget.Toast.makeText(requireContext(), getString(R.string.failed), android.widget.Toast.LENGTH_SHORT).show());
             }
 
             @Override

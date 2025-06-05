@@ -1,167 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:background="@drawable/bottom_bar"
+        android:padding="8dp">
 
-
-        <TextView
-            android:id="@+id/server_state_text"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/status_stop"
-            android:textSize="24sp"
-            android:gravity="center" />
-
-        <TextView
-            android:id="@+id/messages_24h_text"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/messages_24h"
-            android:textSize="20sp"
-            android:gravity="center" />
+        <ImageButton
+            android:id="@+id/users_button"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:src="@android:drawable/ic_menu_myplaces"
+            android:contentDescription="@string/users" />
 
         <TextView
-            android:id="@+id/messages_total_text"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/messages_total"
-            android:textSize="20sp"
-            android:gravity="center" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center">
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:orientation="vertical">
-
-                <com.example.serveradminapp.GaugeView
-                    android:id="@+id/cpu_gauge"
-                    android:layout_width="72dp"
-                    android:layout_height="72dp"
-                    android:layout_margin="8dp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/cpu" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:orientation="vertical">
-
-                <com.example.serveradminapp.GaugeView
-                    android:id="@+id/mem_gauge"
-                    android:layout_width="72dp"
-                    android:layout_height="72dp"
-                    android:layout_margin="8dp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/mem" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:orientation="vertical">
-
-                <com.example.serveradminapp.GaugeView
-                    android:id="@+id/net_gauge"
-                    android:layout_width="72dp"
-                    android:layout_height="72dp"
-                    android:layout_margin="8dp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/net" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:orientation="vertical">
-
-                <com.example.serveradminapp.GaugeView
-                    android:id="@+id/disk_gauge"
-                    android:layout_width="72dp"
-                    android:layout_height="72dp"
-                    android:layout_margin="8dp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/disk" />
-            </LinearLayout>
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
+            android:id="@+id/models_button"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
             android:gravity="center"
-            android:layout_marginTop="16dp"
-            android:background="@drawable/bottom_bar"
-            android:padding="8dp">
+            android:text="@string/ai"
+            android:textStyle="bold"
+            android:textSize="18sp" />
 
-            <ImageButton
-                android:id="@+id/users_button"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_weight="1"
-                android:background="@android:color/transparent"
-                android:src="@android:drawable/ic_menu_myplaces"
-                android:contentDescription="@string/users" />
+        <ImageButton
+            android:id="@+id/chats_button"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:src="@android:drawable/ic_menu_send"
+            android:contentDescription="@string/chats" />
 
-            <TextView
-                android:id="@+id/models_button"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:text="@string/ai"
-                android:textStyle="bold"
-                android:textSize="18sp" />
-
-            <ImageButton
-                android:id="@+id/chats_button"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_weight="1"
-                android:background="@android:color/transparent"
-                android:src="@android:drawable/ic_menu_send"
-                android:contentDescription="@string/chats" />
-
-            <ImageButton
-                android:id="@+id/settings_button"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_weight="1"
-                android:background="@android:color/transparent"
-                android:src="@android:drawable/ic_menu_preferences"
-                android:contentDescription="@string/settings" />
-        </LinearLayout>
+        <ImageButton
+            android:id="@+id/settings_button"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:src="@android:drawable/ic_menu_preferences"
+            android:contentDescription="@string/settings" />
     </LinearLayout>
-</ScrollView>
+</LinearLayout>
