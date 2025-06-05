@@ -8,14 +8,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <ImageButton
-            android:id="@+id/back_button"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:background="@android:color/transparent"
-            android:src="@drawable/ic_back"
-            android:tint="@android:color/white" />
-
         <TextView
             android:id="@+id/detail_username"
             android:layout_width="match_parent"

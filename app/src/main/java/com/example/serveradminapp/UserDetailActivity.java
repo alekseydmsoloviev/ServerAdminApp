@@ -10,6 +10,7 @@ import android.widget.TextView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 import android.view.View;
+import android.content.Context;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -39,6 +40,11 @@ public class UserDetailActivity extends AppCompatActivity {
     private TextView totalView;
 
     @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(LocaleUtil.attach(newBase));
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         LocaleUtil.apply(this);
         super.onCreate(savedInstanceState);
@@ -49,9 +55,6 @@ public class UserDetailActivity extends AppCompatActivity {
             return;
         }
         setContentView(R.layout.activity_user_detail);
-
-        View backButton = findViewById(R.id.back_button);
-        backButton.setOnClickListener(v -> finish());
 
         username = getIntent().getStringExtra("username");
         if (username == null) {

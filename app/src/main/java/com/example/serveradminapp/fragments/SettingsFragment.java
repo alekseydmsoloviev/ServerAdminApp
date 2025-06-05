@@ -1,61 +1,66 @@
-package com.example.serveradminapp;
+package com.example.serveradminapp.fragments;
 
+import android.content.Context;
 import android.os.Bundle;
-import android.content.Intent;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.view.View;
-import android.content.Context;
-import java.util.Locale;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+
+import com.example.serveradminapp.LocaleUtil;
+import com.example.serveradminapp.R;
+import com.example.serveradminapp.ServerApi;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.Locale;
+
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 
-public class SettingsActivity extends AppCompatActivity {
+public class SettingsFragment extends Fragment {
 
     @Override
-    protected void attachBaseContext(Context newBase) {
-        super.attachBaseContext(LocaleUtil.attach(newBase));
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        LocaleUtil.attach(context);
+        LocaleUtil.apply(requireActivity());
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.activity_settings, container, false);
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        LocaleUtil.apply(this);
-        super.onCreate(savedInstanceState);
-        ServerApi.restore(this);
-        if (ServerApi.get() == null) {
-            startActivity(new Intent(this, LoginActivity.class));
-            finish();
-            return;
-        }
-        setContentView(R.layout.activity_settings);
-        EditText portEdit = findViewById(R.id.port_edit);
-        EditText limitEdit = findViewById(R.id.limit_edit);
-        android.widget.Spinner langSpinner = findViewById(R.id.lang_spinner);
-        android.widget.ArrayAdapter<CharSequence> langAdapter =
-                android.widget.ArrayAdapter.createFromResource(this,
-                        R.array.languages, R.layout.spinner_item_big);
-        langAdapter.setDropDownViewResource(R.layout.spinner_dropdown_big);
-        langSpinner.setAdapter(langAdapter);
-        langSpinner.setSelection("ru".equals(getSharedPreferences("app_prefs",
-                MODE_PRIVATE).getString("lang", Locale.getDefault().getLanguage())) ? 1 : 0);
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        EditText portEdit = view.findViewById(R.id.port_edit);
+        EditText limitEdit = view.findViewById(R.id.limit_edit);
+        android.widget.Spinner langSpinner = view.findViewById(R.id.lang_spinner);
+        langSpinner.setAdapter(android.widget.ArrayAdapter.createFromResource(requireContext(),
+                R.array.languages, android.R.layout.simple_spinner_item));
+        langSpinner.setSelection("ru".equals(requireActivity().getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+                .getString("lang", Locale.getDefault().getLanguage())) ? 1 : 0);
         langSpinner.post(() -> langSpinner.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
             int last = langSpinner.getSelectedItemPosition();
 
             @Override
-            public void onItemSelected(android.widget.AdapterView<?> parent, View view, int position, long id) {
+            public void onItemSelected(android.widget.AdapterView<?> parent, View itemView, int position, long id) {
                 if (position != last) {
                     last = position;
                     String lang = position == 1 ? "ru" : "en";
-                    LocaleUtil.setLocale(SettingsActivity.this, lang);
-                    recreate();
+                    LocaleUtil.setLocale(requireContext(), lang);
+                    requireActivity().recreate();
                 }
             }
 
@@ -63,8 +68,8 @@ public class SettingsActivity extends AppCompatActivity {
             public void onNothingSelected(android.widget.AdapterView<?> parent) {
             }
         }));
-        Button saveButton = findViewById(R.id.save_button);
-        Button restartButton = findViewById(R.id.restart_button);
+        Button saveButton = view.findViewById(R.id.save_button);
+        Button restartButton = view.findViewById(R.id.restart_button);
 
         loadConfig(portEdit, limitEdit);
 
@@ -76,7 +81,8 @@ public class SettingsActivity extends AppCompatActivity {
         ServerApi.get().loadConfig(new okhttp3.Callback() {
             @Override
             public void onFailure(@NonNull okhttp3.Call call, @NonNull IOException e) {
-                runOnUiThread(() -> android.widget.Toast.makeText(SettingsActivity.this, getString(R.string.failed_load), android.widget.Toast.LENGTH_SHORT).show());
+                requireActivity().runOnUiThread(() ->
+                        android.widget.Toast.makeText(requireContext(), getString(R.string.failed_load), android.widget.Toast.LENGTH_SHORT).show());
             }
 
             @Override
@@ -90,7 +96,7 @@ public class SettingsActivity extends AppCompatActivity {
                 response.close();
                 try {
                     JSONObject obj = new JSONObject(body);
-                    runOnUiThread(() -> {
+                    requireActivity().runOnUiThread(() -> {
                         portEdit.setText(obj.optString("port"));
                         limitEdit.setText(obj.optString("daily_limit"));
                     });
@@ -107,22 +113,24 @@ public class SettingsActivity extends AppCompatActivity {
             obj.put("port", Integer.parseInt(portEdit.getText().toString().trim()));
             obj.put("daily_limit", Integer.parseInt(limitEdit.getText().toString().trim()));
         } catch (JSONException e) {
-            android.widget.Toast.makeText(this, getString(R.string.invalid_input), android.widget.Toast.LENGTH_SHORT).show();
+            android.widget.Toast.makeText(requireContext(), getString(R.string.invalid_input), android.widget.Toast.LENGTH_SHORT).show();
             return;
         }
         RequestBody body = RequestBody.create(obj.toString(), MediaType.get("application/json"));
         String lang = langSpinner.getSelectedItemPosition() == 1 ? "ru" : "en";
-        LocaleUtil.setLocale(this, lang);
+        LocaleUtil.setLocale(requireContext(), lang);
         ServerApi.get().updateConfig(body, new okhttp3.Callback() {
             @Override
             public void onFailure(@NonNull okhttp3.Call call, @NonNull IOException e) {
-                runOnUiThread(() -> android.widget.Toast.makeText(SettingsActivity.this, getString(R.string.failed), android.widget.Toast.LENGTH_SHORT).show());
+                requireActivity().runOnUiThread(() ->
+                        android.widget.Toast.makeText(requireContext(), getString(R.string.failed), android.widget.Toast.LENGTH_SHORT).show());
             }
 
             @Override
             public void onResponse(@NonNull okhttp3.Call call, @NonNull okhttp3.Response response) throws IOException {
                 response.close();
-                runOnUiThread(() -> android.widget.Toast.makeText(SettingsActivity.this, response.isSuccessful() ? getString(R.string.saved) : getString(R.string.error), android.widget.Toast.LENGTH_SHORT).show());
+                requireActivity().runOnUiThread(() ->
+                        android.widget.Toast.makeText(requireContext(), response.isSuccessful() ? getString(R.string.saved) : getString(R.string.error), android.widget.Toast.LENGTH_SHORT).show());
             }
         });
     }
@@ -131,13 +139,15 @@ public class SettingsActivity extends AppCompatActivity {
         ServerApi.get().restartServer(new okhttp3.Callback() {
             @Override
             public void onFailure(@NonNull okhttp3.Call call, @NonNull IOException e) {
-                runOnUiThread(() -> android.widget.Toast.makeText(SettingsActivity.this, getString(R.string.failed), android.widget.Toast.LENGTH_SHORT).show());
+                requireActivity().runOnUiThread(() ->
+                        android.widget.Toast.makeText(requireContext(), getString(R.string.failed), android.widget.Toast.LENGTH_SHORT).show());
             }
 
             @Override
             public void onResponse(@NonNull okhttp3.Call call, @NonNull okhttp3.Response response) throws IOException {
                 response.close();
-                runOnUiThread(() -> android.widget.Toast.makeText(SettingsActivity.this, getString(R.string.restarting), android.widget.Toast.LENGTH_SHORT).show());
+                requireActivity().runOnUiThread(() ->
+                        android.widget.Toast.makeText(requireContext(), getString(R.string.restarting), android.widget.Toast.LENGTH_SHORT).show());
             }
         });
     }
