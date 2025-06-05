@@ -11,6 +11,7 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.ImageButton;
+import android.content.Context;
 import java.util.ArrayList;
 
 import androidx.annotation.NonNull;
@@ -35,6 +36,11 @@ public class ModelsActivity extends AppCompatActivity {
     private TextView progressText;
     private okhttp3.WebSocket ws;
     private String installingVariant;
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(LocaleUtil.attach(newBase));
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

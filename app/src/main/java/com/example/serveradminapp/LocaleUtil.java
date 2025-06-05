@@ -24,14 +24,25 @@ public class LocaleUtil {
         Resources res = context.getResources();
         Configuration config = res.getConfiguration();
         if (!lang.equals(config.locale.getLanguage())) {
+            config = new Configuration(config);
             config.setLocale(locale);
-            res.updateConfiguration(config, res.getDisplayMetrics());
-        }
-        if (context instanceof Activity) {
-            ((Activity) context).getApplicationContext().getResources()
-                    .updateConfiguration(config, res.getDisplayMetrics());
+            context = context.createConfigurationContext(config);
         }
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
                 .edit().putString(KEY_LANG, lang).apply();
+    }
+
+    public static Context attach(Context context) {
+        SharedPreferences prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+        String lang = prefs.getString(KEY_LANG, Locale.getDefault().getLanguage());
+        Locale locale = new Locale(lang);
+        Locale.setDefault(locale);
+        Configuration config = context.getResources().getConfiguration();
+        if (!lang.equals(config.locale.getLanguage())) {
+            Configuration newConfig = new Configuration(config);
+            newConfig.setLocale(locale);
+            context = context.createConfigurationContext(newConfig);
+        }
+        return context;
     }
 }

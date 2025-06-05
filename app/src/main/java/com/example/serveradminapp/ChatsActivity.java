@@ -10,6 +10,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.content.Context;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -32,6 +33,11 @@ public class ChatsActivity extends AppCompatActivity {
     private final ArrayList<JSONObject> chatList = new ArrayList<>();
     private ChatAdapter adapter;
     private String sortField = "created_at";
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(LocaleUtil.attach(newBase));
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

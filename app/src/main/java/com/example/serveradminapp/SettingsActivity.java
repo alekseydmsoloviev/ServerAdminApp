@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.widget.Button;
 import android.widget.EditText;
 import android.view.View;
+import android.content.Context;
 import java.util.Locale;
 
 import androidx.annotation.NonNull;
@@ -18,6 +19,11 @@ import okhttp3.MediaType;
 import okhttp3.RequestBody;
 
 public class SettingsActivity extends AppCompatActivity {
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(LocaleUtil.attach(newBase));
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
