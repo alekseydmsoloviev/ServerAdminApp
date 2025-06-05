@@ -20,8 +20,8 @@ public class LoginActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        LocaleUtil.apply(this);
         super.onCreate(savedInstanceState);
-
         binding = ActivityLoginBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
@@ -45,7 +45,7 @@ public class LoginActivity extends AppCompatActivity {
                 @Override
                 public void onFailure(@NonNull okhttp3.Call call, @NonNull IOException e) {
                     runOnUiThread(() ->
-                            android.widget.Toast.makeText(LoginActivity.this, "Connection failed", android.widget.Toast.LENGTH_SHORT).show());
+                            android.widget.Toast.makeText(LoginActivity.this, getString(R.string.connection_failed), android.widget.Toast.LENGTH_SHORT).show());
                 }
 
                 @Override
@@ -60,7 +60,7 @@ public class LoginActivity extends AppCompatActivity {
                         });
                     } else {
                         runOnUiThread(() ->
-                                android.widget.Toast.makeText(LoginActivity.this, "Invalid credentials", android.widget.Toast.LENGTH_SHORT).show());
+                                android.widget.Toast.makeText(LoginActivity.this, getString(R.string.invalid_credentials), android.widget.Toast.LENGTH_SHORT).show());
                     }
                 }
             });

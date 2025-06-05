@@ -62,8 +62,8 @@ public class MainActivity extends AppCompatActivity {
                     final int disk = (int) Math.round(obj.optDouble("disk"));
                     setStatusWork();
                     runOnUiThread(() -> {
-                        if (day > 0) messages24hText.setText("Messages last 24h: " + day);
-                        if (total > 0) messagesTotalText.setText("Messages total: " + total);
+                        if (day > 0) messages24hText.setText(getString(R.string.messages_24h_value, day));
+                        if (total > 0) messagesTotalText.setText(getString(R.string.messages_total_value, total));
                         cpuGauge.setPercent(cpu);
                         memGauge.setPercent(mem);
                         netGauge.setPercent(net);
@@ -78,23 +78,24 @@ public class MainActivity extends AppCompatActivity {
         }
     };
     private final Handler statusHandler = new Handler(Looper.getMainLooper());
-    private final Runnable statusTimeout = () -> serverStateText.setText("Status: Stop");
+    private final Runnable statusTimeout = () -> serverStateText.setText(getString(R.string.status_stop));
 
     private void setStatusWork() {
         statusHandler.removeCallbacks(statusTimeout);
         statusHandler.removeCallbacks(reconnectRunnable);
-        statusHandler.post(() -> serverStateText.setText("Status: Work"));
+        statusHandler.post(() -> serverStateText.setText(getString(R.string.status_work)));
         statusHandler.postDelayed(statusTimeout, 15000);
     }
 
     private void setStatusStop() {
         statusHandler.removeCallbacks(statusTimeout);
-        statusHandler.post(() -> serverStateText.setText("Status: Stop"));
+        statusHandler.post(() -> serverStateText.setText(getString(R.string.status_stop)));
         statusHandler.postDelayed(reconnectRunnable, 5000);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        LocaleUtil.apply(this);
         super.onCreate(savedInstanceState);
         ServerApi.restore(this);
         if (ServerApi.get() == null) {
@@ -105,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         serverStateText = findViewById(R.id.server_state_text);
-        serverStateText.setText("Status: Stop");
+        serverStateText.setText(getString(R.string.status_stop));
         messages24hText = findViewById(R.id.messages_24h_text);
         messagesTotalText = findViewById(R.id.messages_total_text);
         cpuGauge = findViewById(R.id.cpu_gauge);
@@ -154,8 +155,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onFailure(@NonNull okhttp3.Call call, @NonNull IOException e) {
                 runOnUiThread(() -> {
-                    messages24hText.setText("Messages last 24h: --");
-                    messagesTotalText.setText("Messages total: --");
+                    messages24hText.setText(R.string.messages_24h);
+                    messagesTotalText.setText(R.string.messages_total);
 
                 });
             }
@@ -181,8 +182,8 @@ public class MainActivity extends AppCompatActivity {
         final int count24h = dayCount;
         final int countTotal = totalCount;
         runOnUiThread(() -> {
-            messages24hText.setText("Messages last 24h: " + count24h);
-            messagesTotalText.setText("Messages total: " + countTotal);
+            messages24hText.setText(getString(R.string.messages_24h_value, count24h));
+            messagesTotalText.setText(getString(R.string.messages_total_value, countTotal));
         });
     }
 

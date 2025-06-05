@@ -38,6 +38,7 @@ public class ModelsActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        LocaleUtil.apply(this);
         super.onCreate(savedInstanceState);
         ServerApi.restore(this);
         if (ServerApi.get() == null) {
@@ -88,7 +89,7 @@ public class ModelsActivity extends AppCompatActivity {
         ServerApi.get().listModels(new okhttp3.Callback() {
             @Override
             public void onFailure(@NonNull okhttp3.Call call, @NonNull IOException e) {
-                runOnUiThread(() -> android.widget.Toast.makeText(ModelsActivity.this, "Failed to load", android.widget.Toast.LENGTH_SHORT).show());
+                runOnUiThread(() -> android.widget.Toast.makeText(ModelsActivity.this, getString(R.string.failed_load), android.widget.Toast.LENGTH_SHORT).show());
             }
 
             @Override
@@ -118,7 +119,7 @@ public class ModelsActivity extends AppCompatActivity {
         ServerApi.get().availableModels(new okhttp3.Callback() {
             @Override
             public void onFailure(@NonNull okhttp3.Call call, @NonNull IOException e) {
-                runOnUiThread(() -> android.widget.Toast.makeText(ModelsActivity.this, "Failed", android.widget.Toast.LENGTH_SHORT).show());
+                runOnUiThread(() -> android.widget.Toast.makeText(ModelsActivity.this, getString(R.string.failed), android.widget.Toast.LENGTH_SHORT).show());
             }
 
             @Override
@@ -148,7 +149,7 @@ public class ModelsActivity extends AppCompatActivity {
         ServerApi.get().modelVariants(name, new okhttp3.Callback() {
             @Override
             public void onFailure(@NonNull okhttp3.Call call, @NonNull IOException e) {
-                runOnUiThread(() -> android.widget.Toast.makeText(ModelsActivity.this, "Failed", android.widget.Toast.LENGTH_SHORT).show());
+                runOnUiThread(() -> android.widget.Toast.makeText(ModelsActivity.this, getString(R.string.failed), android.widget.Toast.LENGTH_SHORT).show());
             }
 
             @Override
@@ -273,7 +274,7 @@ public class ModelsActivity extends AppCompatActivity {
         ServerApi.get().deleteModel(name, new okhttp3.Callback() {
             @Override
             public void onFailure(@NonNull okhttp3.Call call, @NonNull IOException e) {
-                runOnUiThread(() -> android.widget.Toast.makeText(ModelsActivity.this, "Error", android.widget.Toast.LENGTH_SHORT).show());
+                runOnUiThread(() -> android.widget.Toast.makeText(ModelsActivity.this, getString(R.string.error), android.widget.Toast.LENGTH_SHORT).show());
             }
 
             @Override
@@ -305,9 +306,9 @@ public class ModelsActivity extends AppCompatActivity {
 
     private void confirmDelete(String name) {
         new android.app.AlertDialog.Builder(this)
-                .setMessage("Delete " + name + "?")
-                .setPositiveButton("Delete", (d, w) -> deleteModel(name))
-                .setNegativeButton("Cancel", null)
+                .setMessage(getString(R.string.delete_q, name))
+                .setPositiveButton(getString(R.string.delete), (d, w) -> deleteModel(name))
+                .setNegativeButton(android.R.string.cancel, null)
                 .show();
     }
 }

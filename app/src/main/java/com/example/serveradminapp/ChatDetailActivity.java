@@ -23,6 +23,7 @@ public class ChatDetailActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        LocaleUtil.apply(this);
         super.onCreate(savedInstanceState);
         ServerApi.restore(this);
         if (ServerApi.get() == null) {
@@ -53,7 +54,7 @@ public class ChatDetailActivity extends AppCompatActivity {
         ServerApi.get().getSession(id, new okhttp3.Callback() {
             @Override
             public void onFailure(@NonNull okhttp3.Call call, @NonNull IOException e) {
-                runOnUiThread(() -> view.setText("Failed"));
+                runOnUiThread(() -> view.setText(getString(R.string.failed)));
             }
 
             @Override
@@ -61,7 +62,7 @@ public class ChatDetailActivity extends AppCompatActivity {
 
                 if (!response.isSuccessful()) {
                     response.close();
-                    runOnUiThread(() -> view.setText("Error " + response.code()));
+                    runOnUiThread(() -> view.setText(getString(R.string.error) + " " + response.code()));
                     return;
                 }
 
@@ -91,7 +92,7 @@ public class ChatDetailActivity extends AppCompatActivity {
                         view.setText(text);
                     });
                 } catch (JSONException ex) {
-                    runOnUiThread(() -> view.setText("Error"));
+                    runOnUiThread(() -> view.setText(getString(R.string.error)));
                 }
             }
         });

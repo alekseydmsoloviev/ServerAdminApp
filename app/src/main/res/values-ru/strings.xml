@@ -1,0 +1,54 @@
+<resources>
+    <string name="app_name">ServerAdminApp</string>
+    <string name="loading">Загрузка…</string>
+    <string name="server_hint">Сервер (ip:порт)</string>
+    <string name="username">Имя пользователя</string>
+    <string name="password">Пароль</string>
+    <string name="login">Войти</string>
+    <string name="add_user">Добавить пользователя</string>
+    <string name="install">Установить</string>
+    <string name="port">Порт</string>
+    <string name="daily_limit">Дневной лимит</string>
+    <string name="save">Сохранить</string>
+    <string name="restart_server">Перезапустить сервер</string>
+    <string name="model">модель</string>
+    <string name="delete">Удалить</string>
+    <string name="edit">Изменить</string>
+    <string name="empty"></string>
+    <string name="status_stop">Статус: Стоп</string>
+    <string name="status_work">Статус: Работа</string>
+    <string name="messages_24h">Сообщений за 24ч: --</string>
+    <string name="messages_total">Всего сообщений: --</string>
+    <string name="messages_24h_value">Сообщений за 24ч: %1$d</string>
+    <string name="messages_total_value">Всего сообщений: %1$d</string>
+    <string name="cpu">ЦП</string>
+    <string name="mem">Память</string>
+    <string name="net">Сеть</string>
+    <string name="disk">Диск</string>
+    <string name="users">Пользователи</string>
+    <string name="ai">ИИ</string>
+    <string name="chats">Чаты</string>
+    <string name="settings">Настройки</string>
+    <string-array name="languages">
+        <item>English</item>
+        <item>Русский</item>
+    </string-array>
+    <string-array name="sort_options">
+        <item>Пользователь</item>
+        <item>Создан</item>
+        <item>Последнее сообщение</item>
+        <item>Сообщения</item>
+    </string-array>
+    <string name="connection_failed">Не удалось подключиться</string>
+    <string name="invalid_credentials">Неверные данные</string>
+    <string name="failed_load">Не удалось загрузить</string>
+    <string name="failed">Ошибка</string>
+    <string name="failed_load_users">Не удалось загрузить пользователей</string>
+    <string name="invalid_input">Неверный ввод</string>
+    <string name="saved">Сохранено</string>
+    <string name="error">Ошибка</string>
+    <string name="restarting">Перезапуск</string>
+    <string name="deleted">Удалено</string>
+    <string name="delete_user_q">Удалить пользователя %1$s?</string>
+    <string name="delete_q">Удалить %1$s?</string>
+</resources>

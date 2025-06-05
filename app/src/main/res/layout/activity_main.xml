@@ -14,7 +14,7 @@
             android:id="@+id/server_state_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Status: Stop"
+            android:text="@string/status_stop"
             android:textSize="24sp"
             android:gravity="center" />
 
@@ -22,7 +22,8 @@
             android:id="@+id/messages_24h_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Messages last 24h: --"
+            android:text="@string/messages_24h"
+
             android:textSize="20sp"
             android:gravity="center" />
 
@@ -30,7 +31,7 @@
             android:id="@+id/messages_total_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Messages total:"
+            android:text="@string/messages_total"
             android:textSize="20sp"
             android:gravity="center" />
 
@@ -56,7 +57,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="CPU" />
+                    android:text="@string/cpu" />
             </LinearLayout>
 
             <LinearLayout
@@ -75,7 +76,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="MEM" />
+                    android:text="@string/mem" />
             </LinearLayout>
 
             <LinearLayout
@@ -94,7 +95,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="NET" />
+                    android:text="@string/net" />
             </LinearLayout>
 
             <LinearLayout
@@ -113,7 +114,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="DISK" />
+                    android:text="@string/disk" />
             </LinearLayout>
         </LinearLayout>
 
@@ -133,7 +134,7 @@
                 android:layout_weight="1"
                 android:background="@android:color/transparent"
                 android:src="@android:drawable/ic_menu_myplaces"
-                android:contentDescription="Users" />
+                android:contentDescription="@string/users" />
 
             <TextView
                 android:id="@+id/models_button"
@@ -141,7 +142,7 @@
                 android:layout_height="48dp"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="AI"
+                android:text="@string/ai"
                 android:textStyle="bold"
                 android:textSize="18sp" />
 
@@ -152,7 +153,7 @@
                 android:layout_weight="1"
                 android:background="@android:color/transparent"
                 android:src="@android:drawable/ic_menu_send"
-                android:contentDescription="Chats" />
+                android:contentDescription="@string/chats" />
 
             <ImageButton
                 android:id="@+id/settings_button"
@@ -161,7 +162,7 @@
                 android:layout_weight="1"
                 android:background="@android:color/transparent"
                 android:src="@android:drawable/ic_menu_preferences"
-                android:contentDescription="Settings" />
+                android:contentDescription="@string/settings" />
         </LinearLayout>
     </LinearLayout>
 </ScrollView>

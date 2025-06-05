@@ -40,6 +40,7 @@ public class UserDetailActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        LocaleUtil.apply(this);
         super.onCreate(savedInstanceState);
         ServerApi.restore(this);
         if (ServerApi.get() == null) {
@@ -189,14 +190,14 @@ public class UserDetailActivity extends AppCompatActivity {
                     obj.put("daily_limit", Integer.parseInt(limitEdit.getText().toString().trim()));
                 }
             } catch (Exception e) {
-                Toast.makeText(this, "Invalid input", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.invalid_input), Toast.LENGTH_SHORT).show();
                 return;
             }
             RequestBody body = RequestBody.create(obj.toString(), MediaType.get("application/json"));
             ServerApi.get().updateUser(body, new okhttp3.Callback() {
                 @Override
                 public void onFailure(@NonNull okhttp3.Call call, @NonNull IOException e) {
-                    runOnUiThread(() -> Toast.makeText(UserDetailActivity.this, "Failed", Toast.LENGTH_SHORT).show());
+                    runOnUiThread(() -> Toast.makeText(UserDetailActivity.this, getString(R.string.failed), Toast.LENGTH_SHORT).show());
                 }
 
                 @Override
@@ -212,15 +213,15 @@ public class UserDetailActivity extends AppCompatActivity {
                 }
             });
         });
-        builder.setNegativeButton("Cancel", null);
+        builder.setNegativeButton(android.R.string.cancel, null);
         builder.show();
     }
 
     private void confirmDelete() {
         new AlertDialog.Builder(this)
-                .setMessage("Delete user " + username + "?")
-                .setPositiveButton("Delete", (d, w) -> deleteUser())
-                .setNegativeButton("Cancel", null)
+                .setMessage(getString(R.string.delete_user_q, username))
+                .setPositiveButton(getString(R.string.delete), (d, w) -> deleteUser())
+                .setNegativeButton(android.R.string.cancel, null)
                 .show();
     }
 
@@ -228,14 +229,14 @@ public class UserDetailActivity extends AppCompatActivity {
         ServerApi.get().deleteUser(username, new okhttp3.Callback() {
             @Override
             public void onFailure(@NonNull okhttp3.Call call, @NonNull IOException e) {
-                runOnUiThread(() -> Toast.makeText(UserDetailActivity.this, "Failed", Toast.LENGTH_SHORT).show());
+                runOnUiThread(() -> Toast.makeText(UserDetailActivity.this, getString(R.string.failed), Toast.LENGTH_SHORT).show());
             }
 
             @Override
             public void onResponse(@NonNull okhttp3.Call call, @NonNull okhttp3.Response response) throws IOException {
                 response.close();
                 runOnUiThread(() -> {
-                    Toast.makeText(UserDetailActivity.this, "Deleted", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(UserDetailActivity.this, getString(R.string.deleted), Toast.LENGTH_SHORT).show();
                     finish();
                 });
             }
