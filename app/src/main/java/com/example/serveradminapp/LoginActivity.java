@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
 import android.content.SharedPreferences;
+import com.example.serveradminapp.databinding.ActivityLoginBinding;
 
 import androidx.annotation.NonNull;
 import java.io.IOException;
@@ -12,6 +13,7 @@ import java.io.IOException;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class LoginActivity extends AppCompatActivity {
+    private ActivityLoginBinding binding;
     private EditText usernameEdit;
     private EditText passwordEdit;
     private EditText serverEdit;
@@ -19,17 +21,18 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
+        binding = ActivityLoginBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
-        usernameEdit = findViewById(R.id.username_edit);
-        passwordEdit = findViewById(R.id.password_edit);
-        serverEdit = findViewById(R.id.server_edit);
+        usernameEdit = binding.usernameEdit;
+        passwordEdit = binding.passwordEdit;
+        serverEdit = binding.serverEdit;
         ServerApi.restore(this);
         SharedPreferences prefs = getSharedPreferences("server_api", MODE_PRIVATE);
         serverEdit.setText(prefs.getString("url", ""));
         usernameEdit.setText(prefs.getString("user", ""));
         passwordEdit.setText(prefs.getString("pass", ""));
-        Button loginButton = findViewById(R.id.login_button);
+        Button loginButton = binding.loginButton;
 
         loginButton.setOnClickListener(v -> {
             String server = serverEdit.getText().toString().trim();
