@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.widget.TextView;
 import android.view.View;
 import android.content.Context;
+import android.text.Html;
+import android.text.Spanned;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
