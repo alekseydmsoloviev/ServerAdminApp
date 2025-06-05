@@ -17,14 +17,6 @@
         android:src="@drawable/ic_back"
         android:tint="@android:color/white" />
 
-    <ImageButton
-        android:id="@+id/back_button"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:background="@android:color/transparent"
-        android:src="@drawable/ic_back"
-        android:tint="@android:color/white" />
-
     <EditText
         android:id="@+id/port_edit"
         android:layout_width="match_parent"
