@@ -107,4 +107,24 @@ public class ChatDetailActivity extends AppCompatActivity {
         });
     }
 
+    private Spanned markdownToSpanned(String md) {
+        String html = Html.escapeHtml(md);
+
+        html = html.replaceAll("\\*\\*(.+?)\\*\\*", "<b>$1</b>");
+        html = html.replaceAll("__(.+?)__", "<b>$1</b>");
+
+        html = html.replaceAll("~~(.+?)~~", "<strike>$1</strike>");
+
+        html = html.replaceAll("(?<!\\*)\\*(.+?)\\*(?!\\*)", "<i>$1</i>");
+        html = html.replaceAll("(?<!_)_(.+?)_(?!_)", "<i>$1</i>");
+
+        html = html.replaceAll("`(.+?)`", "<tt>$1</tt>");
+
+        html = html.replaceAll("(?m)^[\\*-]\\s+(.+)$", "&#8226; $1");
+
+        html = html.replace("\n", "<br>");
+
+        return Html.fromHtml(html, Html.FROM_HTML_MODE_LEGACY);
+    }
+
 }
