@@ -66,7 +66,7 @@ public class SettingsFragment extends Fragment {
                     last = position;
                     String lang = position == 1 ? "ru" : "en";
                     LocaleUtil.setLocale(requireContext(), lang);
-                    requireActivity().recreate();
+                    LocaleUtil.restart(requireActivity());
                 }
             }
 
