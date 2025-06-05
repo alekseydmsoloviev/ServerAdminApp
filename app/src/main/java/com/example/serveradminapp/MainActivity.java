@@ -37,11 +37,13 @@ public class MainActivity extends AppCompatActivity {
         View modelsButton = findViewById(R.id.models_button);
         View chatsButton = findViewById(R.id.chats_button);
         View settingsButton = findViewById(R.id.settings_button);
+        View homeButton = findViewById(R.id.home_button);
 
         usersButton.setOnClickListener(v -> switchFragment(new UsersFragment()));
         modelsButton.setOnClickListener(v -> switchFragment(new ModelsFragment()));
         chatsButton.setOnClickListener(v -> switchFragment(new ChatsFragment()));
         settingsButton.setOnClickListener(v -> switchFragment(new SettingsFragment()));
+        homeButton.setOnClickListener(v -> switchFragment(new DashboardFragment()));
 
         if (savedInstanceState == null) {
             switchFragment(new DashboardFragment());

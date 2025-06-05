@@ -53,8 +53,6 @@ public class ModelsActivity extends AppCompatActivity {
             return;
         }
         setContentView(R.layout.activity_models);
-        View backButton = findViewById(R.id.back_button);
-        backButton.setOnClickListener(v -> finish());
 
         listView = findViewById(R.id.models_list);
         availableSpinner = findViewById(R.id.available_spinner);

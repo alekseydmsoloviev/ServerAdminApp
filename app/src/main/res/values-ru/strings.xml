@@ -29,6 +29,7 @@
     <string name="ai">ИИ</string>
     <string name="chats">Чаты</string>
     <string name="settings">Настройки</string>
+    <string name="home">Главная</string>
     <string-array name="languages">
         <item>English</item>
         <item>Русский</item>

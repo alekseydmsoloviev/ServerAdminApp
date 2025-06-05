@@ -38,8 +38,6 @@ public class ChatDetailActivity extends AppCompatActivity {
             return;
         }
         setContentView(R.layout.activity_chat_detail);
-        View backButton = findViewById(R.id.back_button);
-        backButton.setOnClickListener(v -> finish());
 
         sessionId = getIntent().getStringExtra("session_id");
         if (sessionId == null) {

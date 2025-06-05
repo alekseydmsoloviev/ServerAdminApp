@@ -46,9 +46,6 @@ public class UsersActivity extends AppCompatActivity {
         }
         setContentView(R.layout.activity_users);
 
-        View backButton = findViewById(R.id.back_button);
-        backButton.setOnClickListener(v -> finish());
-
         listView = findViewById(R.id.users_list);
         Button addButton = findViewById(R.id.add_user_button);
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, userList);
