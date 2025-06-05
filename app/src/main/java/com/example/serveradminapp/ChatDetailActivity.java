@@ -7,7 +7,6 @@ import android.view.View;
 import android.content.Context;
 import android.text.Html;
 import android.text.Spanned;
-import androidx.core.text.HtmlCompat;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -94,8 +93,7 @@ public class ChatDetailActivity extends AppCompatActivity {
                         sb.append(getString(R.string.no_messages));
                     }
 
-                    final CharSequence text = HtmlCompat.fromHtml(sb.toString(),
-                            HtmlCompat.FROM_HTML_MODE_LEGACY);
+                    final String text = sb.toString();
 
                     final String title = pageTitle;
                     runOnUiThread(() -> {
