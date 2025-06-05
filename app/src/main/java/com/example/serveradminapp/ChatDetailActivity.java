@@ -51,7 +51,10 @@ public class ChatDetailActivity extends AppCompatActivity {
         messagesView.setText(R.string.loading);
 
         View refreshButton = findViewById(R.id.refresh_button);
+        View backButton = findViewById(R.id.back_button);
+
         refreshButton.setOnClickListener(v -> loadMessages(sessionId, messagesView));
+        backButton.setOnClickListener(v -> finish());
 
         loadMessages(sessionId, messagesView);
     }
