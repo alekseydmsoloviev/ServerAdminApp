@@ -4,7 +4,9 @@ import android.os.Bundle;
 import android.content.Intent;
 import android.widget.TextView;
 import android.view.View;
-import android.text.TextUtils;
+import android.content.Context;
+import android.text.Html;
+import android.text.Spanned;
 import androidx.core.text.HtmlCompat;
 
 import androidx.annotation.NonNull;
@@ -98,7 +100,7 @@ public class ChatDetailActivity extends AppCompatActivity {
                     final String title = pageTitle;
                     runOnUiThread(() -> {
                         setTitle(title);
-                        view.setText(markdownToSpanned(text));
+                        view.setText(markdownToSpanned(text.toString()));
                     });
                 } catch (JSONException ex) {
                     runOnUiThread(() -> view.setText(getString(R.string.error)));
