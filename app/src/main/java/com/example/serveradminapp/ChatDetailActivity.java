@@ -98,7 +98,7 @@ public class ChatDetailActivity extends AppCompatActivity {
                     final String title = pageTitle;
                     runOnUiThread(() -> {
                         setTitle(title);
-                        view.setText(markdownToSpanned(text));
+                        view.setText(markdownToSpanned(text.toString()));
                     });
                 } catch (JSONException ex) {
                     runOnUiThread(() -> view.setText(getString(R.string.error)));
