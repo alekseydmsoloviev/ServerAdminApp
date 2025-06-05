@@ -3,7 +3,6 @@ package com.example.serveradminapp;
 import android.os.Bundle;
 import android.content.Intent;
 import android.widget.TextView;
-import android.widget.Button;
 import android.text.TextUtils;
 import android.view.View;
 import android.content.Context;
@@ -52,9 +51,7 @@ public class ChatDetailActivity extends AppCompatActivity {
         messagesView.setText(R.string.loading);
 
         View refreshButton = findViewById(R.id.refresh_button);
-        View backButton = findViewById(R.id.back_button);
         refreshButton.setOnClickListener(v -> loadMessages(sessionId, messagesView));
-        backButton.setOnClickListener(v -> finish());
 
         loadMessages(sessionId, messagesView);
     }
