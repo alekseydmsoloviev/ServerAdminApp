@@ -28,9 +28,55 @@ public class MainActivity extends AppCompatActivity {
     private GaugeView memGauge;
     private GaugeView netGauge;
     private GaugeView diskGauge;
-
     private WebSocket metricsSocket;
     private final Runnable reconnectRunnable = this::connectMetrics;
+    private final WebSocketListener metricsListener = new WebSocketListener() {
+        @Override
+        public void onOpen(@NonNull WebSocket webSocket, @NonNull Response response) {
+            metricsSocket = webSocket;
+            setStatusWork();
+        }
+
+        @Override
+        public void onClosed(@NonNull WebSocket webSocket, int code, @NonNull String reason) {
+            metricsSocket = null;
+            setStatusStop();
+        }
+
+        @Override
+        public void onFailure(@NonNull WebSocket webSocket, @NonNull Throwable t, Response response) {
+            metricsSocket = null;
+            setStatusStop();
+        }
+
+        @Override
+        public void onMessage(@NonNull WebSocket webSocket, @NonNull String text) {
+            try {
+                JSONObject obj = new JSONObject(text);
+                if (obj.has("cpu")) {
+                    final int day = obj.optInt("day_total");
+                    final int total = obj.optInt("total");
+                    final int cpu = (int) Math.round(obj.optDouble("cpu"));
+                    final int mem = (int) Math.round(obj.optDouble("memory"));
+                    final int net = (int) Math.round(obj.optDouble("network"));
+                    final int disk = (int) Math.round(obj.optDouble("disk"));
+                    setStatusWork();
+                    runOnUiThread(() -> {
+                        if (day > 0) messages24hText.setText("Messages last 24h: " + day);
+                        if (total > 0) messagesTotalText.setText("Messages total: " + total);
+                        cpuGauge.setPercent(cpu);
+                        memGauge.setPercent(mem);
+                        netGauge.setPercent(net);
+                        diskGauge.setPercent(disk);
+                    });
+                } else if (obj.has("snapshot")) {
+                    JSONObject snap = obj.getJSONObject("snapshot");
+                    updateUsageFromJson(snap);
+                }
+            } catch (JSONException ignored) {
+            }
+        }
+    };
     private final Handler statusHandler = new Handler(Looper.getMainLooper());
     private final Runnable statusTimeout = () -> serverStateText.setText("Status: Stop");
 
@@ -98,76 +144,7 @@ public class MainActivity extends AppCompatActivity {
             metricsSocket.cancel();
             metricsSocket = null;
         }
-        metricsSocket = ServerApi.get().connectMetrics(new WebSocketListener() {
-            @Override
-            public void onOpen(@NonNull WebSocket webSocket, @NonNull okhttp3.Response response) {
-                metricsSocket = webSocket;
-                setStatusWork();
-            }
-
-            @Override
-            public void onClosed(@NonNull WebSocket webSocket, int code, @NonNull String reason) {
-                metricsSocket = null;
-                setStatusStop();
-            }
-
-            @Override
-            public void onFailure(@NonNull WebSocket webSocket, @NonNull Throwable t, okhttp3.Response response) {
-                metricsSocket = null;
-                setStatusStop();
-            }
-            @Override
-            public void onOpen(@NonNull WebSocket webSocket, @NonNull okhttp3.Response response) {
-                setStatusWork();
-
-            }
-
-            @Override
-            public void onClosed(@NonNull WebSocket webSocket, int code, @NonNull String reason) {
-
-                setStatusStop();
-
-            }
-
-            @Override
-            public void onFailure(@NonNull WebSocket webSocket, @NonNull Throwable t, okhttp3.Response response) {
-                setStatusStop();
-
-            }
-            @Override
-            public void onMessage(@NonNull WebSocket webSocket, @NonNull String text) {
-                try {
-                    JSONObject obj = new JSONObject(text);
-                    if (obj.has("cpu")) {
-
-                        final int day = obj.optInt("day_total");
-                        final int total = obj.optInt("total");
-                        final int cpu = (int) Math.round(obj.optDouble("cpu"));
-                        final int mem = (int) Math.round(obj.optDouble("memory"));
-                        final int net = (int) Math.round(obj.optDouble("network"));
-                        final int disk = (int) Math.round(obj.optDouble("disk"));
-
-                        setStatusWork();
-                        runOnUiThread(() -> {
-                            if (day > 0) messages24hText.setText("Messages last 24h: " + day);
-                            if (total > 0) messagesTotalText.setText("Messages total: " + total);
-                            cpuGauge.setPercent(cpu);
-                            memGauge.setPercent(mem);
-                            netGauge.setPercent(net);
-                            diskGauge.setPercent(disk);
-                        });
-                    } else if (obj.has("snapshot")) {
-                        // overview snapshot may include usage data
-
-                        JSONObject snap = obj.getJSONObject("snapshot");
-                        updateUsageFromJson(snap);
-                    } else if ("progress".equals(obj.optString("type"))) {
-                        // ignore progress for now
-                    }
-                } catch (JSONException ignored) {
-                }
-            }
-        });
+        metricsSocket = ServerApi.get().connectMetrics(metricsListener);
     }
 
 
