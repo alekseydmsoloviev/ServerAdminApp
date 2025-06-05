@@ -6,6 +6,7 @@ import android.widget.TextView;
 import android.widget.Button;
 import android.text.TextUtils;
 import android.view.View;
+import android.content.Context;
 import androidx.core.text.HtmlCompat;
 
 import androidx.annotation.NonNull;
@@ -18,8 +19,13 @@ import org.json.JSONObject;
 import java.io.IOException;
 
 public class ChatDetailActivity extends AppCompatActivity {
-
+    
     private String sessionId;
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(LocaleUtil.attach(newBase));
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
