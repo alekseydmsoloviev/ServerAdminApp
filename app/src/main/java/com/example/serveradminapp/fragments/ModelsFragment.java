@@ -1,80 +1,85 @@
-package com.example.serveradminapp;
+package com.example.serveradminapp.fragments;
 
+import android.app.AlertDialog;
+import android.content.Context;
 import android.os.Bundle;
-import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.ImageButton;
-import android.content.Context;
-import java.util.ArrayList;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+
+import com.example.serveradminapp.LocaleUtil;
+import com.example.serveradminapp.R;
+import com.example.serveradminapp.ServerApi;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
-public class ModelsActivity extends AppCompatActivity {
+public class ModelsFragment extends Fragment {
 
-    private ArrayList<String> modelList = new ArrayList<>();
+    private final ArrayList<String> modelList = new ArrayList<>();
     private ModelAdapter adapter;
     private ListView listView;
     private Spinner availableSpinner;
     private Spinner variantSpinner;
     private ArrayAdapter<String> availableAdapter;
     private ArrayAdapter<String> variantAdapter;
-    private ArrayList<String> availableList = new ArrayList<>();
-    private ArrayList<String> variantList = new ArrayList<>();
+    private final ArrayList<String> availableList = new ArrayList<>();
+    private final ArrayList<String> variantList = new ArrayList<>();
     private TextView progressText;
     private okhttp3.WebSocket ws;
     private String installingVariant;
 
     @Override
-    protected void attachBaseContext(Context newBase) {
-        super.attachBaseContext(LocaleUtil.attach(newBase));
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        LocaleUtil.attach(context);
+        LocaleUtil.apply(requireActivity());
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.activity_models, container, false);
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        LocaleUtil.apply(this);
-        super.onCreate(savedInstanceState);
-        ServerApi.restore(this);
-        if (ServerApi.get() == null) {
-            startActivity(new Intent(this, LoginActivity.class));
-            finish();
-            return;
-        }
-        setContentView(R.layout.activity_models);
-
-        listView = findViewById(R.id.models_list);
-        availableSpinner = findViewById(R.id.available_spinner);
-        variantSpinner = findViewById(R.id.variant_spinner);
-        Button installButton = findViewById(R.id.install_model_button);
-        progressText = findViewById(R.id.progress_text);
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        listView = view.findViewById(R.id.models_list);
+        availableSpinner = view.findViewById(R.id.available_spinner);
+        variantSpinner = view.findViewById(R.id.variant_spinner);
+        Button installButton = view.findViewById(R.id.install_model_button);
+        progressText = view.findViewById(R.id.progress_text);
 
         adapter = new ModelAdapter();
         listView.setAdapter(adapter);
 
-        availableAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, availableList);
+        availableAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, availableList);
         availableAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         availableSpinner.setAdapter(availableAdapter);
         availableSpinner.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
-            @Override public void onItemSelected(android.widget.AdapterView<?> parent, android.view.View view, int position, long id) {
+            @Override public void onItemSelected(android.widget.AdapterView<?> parent, View v, int position, long id) {
                 String name = availableList.get(position);
                 loadVariants(name);
             }
             @Override public void onNothingSelected(android.widget.AdapterView<?> parent) {}
         });
 
-        variantAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, variantList);
+        variantAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, variantList);
         variantAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         variantSpinner.setAdapter(variantAdapter);
 
@@ -82,18 +87,25 @@ public class ModelsActivity extends AppCompatActivity {
         loadAvailableModels();
         connectMetrics();
         installButton.setOnClickListener(v -> installSelected());
-        listView.setOnItemLongClickListener((parent, view, position, id) -> {
+        listView.setOnItemLongClickListener((parent, itemView, position, id) -> {
             String model = modelList.get(position);
             confirmDelete(model);
             return true;
         });
     }
 
+    @Override
+    public void onDestroyView() {
+        if (ws != null) ws.close(1000, null);
+        super.onDestroyView();
+    }
+
     private void loadModels() {
         ServerApi.get().listModels(new okhttp3.Callback() {
             @Override
             public void onFailure(@NonNull okhttp3.Call call, @NonNull IOException e) {
-                runOnUiThread(() -> android.widget.Toast.makeText(ModelsActivity.this, getString(R.string.failed_load), android.widget.Toast.LENGTH_SHORT).show());
+                requireActivity().runOnUiThread(() ->
+                        android.widget.Toast.makeText(requireContext(), getString(R.string.failed_load), android.widget.Toast.LENGTH_SHORT).show());
             }
 
             @Override
@@ -111,7 +123,7 @@ public class ModelsActivity extends AppCompatActivity {
                     for (int i = 0; i < array.length(); i++) {
                         modelList.add(array.getString(i));
                     }
-                    runOnUiThread(() -> adapter.notifyDataSetChanged());
+                    requireActivity().runOnUiThread(() -> adapter.notifyDataSetChanged());
                 } catch (JSONException ex) {
                     onFailure(call, new IOException(ex));
                 }
@@ -123,7 +135,8 @@ public class ModelsActivity extends AppCompatActivity {
         ServerApi.get().availableModels(new okhttp3.Callback() {
             @Override
             public void onFailure(@NonNull okhttp3.Call call, @NonNull IOException e) {
-                runOnUiThread(() -> android.widget.Toast.makeText(ModelsActivity.this, getString(R.string.failed), android.widget.Toast.LENGTH_SHORT).show());
+                requireActivity().runOnUiThread(() ->
+                        android.widget.Toast.makeText(requireContext(), getString(R.string.failed), android.widget.Toast.LENGTH_SHORT).show());
             }
 
             @Override
@@ -141,7 +154,7 @@ public class ModelsActivity extends AppCompatActivity {
                     for (int i = 0; i < arr.length(); i++) {
                         availableList.add(arr.getString(i));
                     }
-                    runOnUiThread(() -> availableAdapter.notifyDataSetChanged());
+                    requireActivity().runOnUiThread(() -> availableAdapter.notifyDataSetChanged());
                 } catch (JSONException ex) {
                     onFailure(call, new IOException(ex));
                 }
@@ -153,7 +166,8 @@ public class ModelsActivity extends AppCompatActivity {
         ServerApi.get().modelVariants(name, new okhttp3.Callback() {
             @Override
             public void onFailure(@NonNull okhttp3.Call call, @NonNull IOException e) {
-                runOnUiThread(() -> android.widget.Toast.makeText(ModelsActivity.this, getString(R.string.failed), android.widget.Toast.LENGTH_SHORT).show());
+                requireActivity().runOnUiThread(() ->
+                        android.widget.Toast.makeText(requireContext(), getString(R.string.failed), android.widget.Toast.LENGTH_SHORT).show());
             }
 
             @Override
@@ -171,7 +185,7 @@ public class ModelsActivity extends AppCompatActivity {
                     for (int i = 0; i < arr.length(); i++) {
                         variantList.add(arr.getString(i));
                     }
-                    runOnUiThread(() -> variantAdapter.notifyDataSetChanged());
+                    requireActivity().runOnUiThread(() -> variantAdapter.notifyDataSetChanged());
                 } catch (JSONException ex) {
                     onFailure(call, new IOException(ex));
                 }
@@ -188,16 +202,12 @@ public class ModelsActivity extends AppCompatActivity {
         ServerApi.get().installModelVariant(fullVariant, new okhttp3.Callback() {
             @Override
             public void onFailure(@NonNull okhttp3.Call call, @NonNull IOException e) {
-                // Some servers close the connection immediately after accepting
-                // the install request which triggers this callback even though
-                // the installation proceeds. We ignore this failure to avoid a
-                // misleading toast.
+                // ignore; installation may still proceed
             }
 
             @Override
             public void onResponse(@NonNull okhttp3.Call call, @NonNull okhttp3.Response response) throws IOException {
                 response.close();
-                // models list will refresh via WebSocket metrics
             }
         });
     }
@@ -215,14 +225,14 @@ public class ModelsActivity extends AppCompatActivity {
                             if ("success".equals(parsed)) {
                                 String name = installingVariant;
                                 installingVariant = null;
-                                runOnUiThread(() -> {
+                                requireActivity().runOnUiThread(() -> {
                                     progressText.setText("");
-                                    android.widget.Toast.makeText(ModelsActivity.this,
+                                    android.widget.Toast.makeText(requireContext(),
                                             "модель " + name + " успешно установлена",
                                             android.widget.Toast.LENGTH_SHORT).show();
                                 });
                             } else {
-                                runOnUiThread(() -> progressText.setText(parsed));
+                                requireActivity().runOnUiThread(() -> progressText.setText(parsed));
                             }
                         }
                     } else if (obj.has("models")) {
@@ -231,14 +241,14 @@ public class ModelsActivity extends AppCompatActivity {
                         for (int i = 0; i < arr.length(); i++) {
                             modelList.add(arr.getString(i));
                         }
-                        runOnUiThread(() -> adapter.notifyDataSetChanged());
+                        requireActivity().runOnUiThread(() -> adapter.notifyDataSetChanged());
                         if (installingVariant != null) {
                             for (int i = 0; i < arr.length(); i++) {
                                 if (installingVariant.equals(arr.getString(i))) {
                                     final String name = installingVariant;
                                     installingVariant = null;
-                                    runOnUiThread(() -> android.widget.Toast.makeText(
-                                            ModelsActivity.this,
+                                    requireActivity().runOnUiThread(() -> android.widget.Toast.makeText(
+                                            requireContext(),
                                             "модель " + name + " успешно установлена",
                                             android.widget.Toast.LENGTH_SHORT).show());
                                     break;
@@ -253,7 +263,6 @@ public class ModelsActivity extends AppCompatActivity {
     }
 
     private String parseProgressLine(String line) {
-        // remove ANSI escape codes and control characters
         line = line.replaceAll("\\u001B\\[[0-9;]*[A-Za-z]", "");
         line = line.replaceAll("[\\r\\n]", " ");
         line = line.replaceAll("[\\x00-\\x1F]", "");
@@ -268,30 +277,9 @@ public class ModelsActivity extends AppCompatActivity {
         return null;
     }
 
-    @Override
-    protected void onDestroy() {
-        if (ws != null) ws.close(1000, null);
-        super.onDestroy();
-    }
-
-    private void deleteModel(String name) {
-        ServerApi.get().deleteModel(name, new okhttp3.Callback() {
-            @Override
-            public void onFailure(@NonNull okhttp3.Call call, @NonNull IOException e) {
-                runOnUiThread(() -> android.widget.Toast.makeText(ModelsActivity.this, getString(R.string.error), android.widget.Toast.LENGTH_SHORT).show());
-            }
-
-            @Override
-            public void onResponse(@NonNull okhttp3.Call call, @NonNull okhttp3.Response response) throws IOException {
-                response.close();
-                loadModels();
-            }
-        });
-    }
-
     private class ModelAdapter extends ArrayAdapter<String> {
         ModelAdapter() {
-            super(ModelsActivity.this, 0, modelList);
+            super(requireContext(), 0, modelList);
         }
 
         @Override
@@ -309,10 +297,26 @@ public class ModelsActivity extends AppCompatActivity {
     }
 
     private void confirmDelete(String name) {
-        new android.app.AlertDialog.Builder(this)
+        new AlertDialog.Builder(requireContext())
                 .setMessage(getString(R.string.delete_q, name))
                 .setPositiveButton(getString(R.string.delete), (d, w) -> deleteModel(name))
                 .setNegativeButton(android.R.string.cancel, null)
                 .show();
+    }
+
+    private void deleteModel(String name) {
+        ServerApi.get().deleteModel(name, new okhttp3.Callback() {
+            @Override
+            public void onFailure(@NonNull okhttp3.Call call, @NonNull IOException e) {
+                requireActivity().runOnUiThread(() ->
+                        android.widget.Toast.makeText(requireContext(), getString(R.string.error), android.widget.Toast.LENGTH_SHORT).show());
+            }
+
+            @Override
+            public void onResponse(@NonNull okhttp3.Call call, @NonNull okhttp3.Response response) throws IOException {
+                response.close();
+                loadModels();
+            }
+        });
     }
 }
