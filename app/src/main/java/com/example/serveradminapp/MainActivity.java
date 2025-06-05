@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.widget.TextView;
 import android.view.View;
+
 import com.example.serveradminapp.GaugeView;
 
 import androidx.annotation.NonNull;
@@ -28,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
     private GaugeView memGauge;
     private GaugeView netGauge;
     private GaugeView diskGauge;
+
     private final Handler statusHandler = new Handler(Looper.getMainLooper());
     private final Runnable statusTimeout = () -> serverStateText.setText("Status: Stop");
 
@@ -91,16 +93,20 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onOpen(@NonNull WebSocket webSocket, @NonNull okhttp3.Response response) {
                 setStatusWork();
+
             }
 
             @Override
             public void onClosed(@NonNull WebSocket webSocket, int code, @NonNull String reason) {
+
                 setStatusStop();
+
             }
 
             @Override
             public void onFailure(@NonNull WebSocket webSocket, @NonNull Throwable t, okhttp3.Response response) {
                 setStatusStop();
+
             }
             @Override
             public void onMessage(@NonNull WebSocket webSocket, @NonNull String text) {
@@ -114,8 +120,10 @@ public class MainActivity extends AppCompatActivity {
                         final int mem = (int) Math.round(obj.optDouble("memory"));
                         final int net = (int) Math.round(obj.optDouble("network"));
                         final int disk = (int) Math.round(obj.optDouble("disk"));
+
                         setStatusWork();
                         runOnUiThread(() -> {
+
                             if (day > 0) messages24hText.setText("Messages last 24h: " + day);
                             if (total > 0) messagesTotalText.setText("Messages total: " + total);
                             cpuGauge.setPercent(cpu);
