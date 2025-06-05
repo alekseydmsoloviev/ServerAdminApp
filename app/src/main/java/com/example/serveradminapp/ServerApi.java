@@ -212,10 +212,15 @@ public class ServerApi {
 
     public WebSocket connectMetrics(@NonNull WebSocketListener listener) {
         String url = baseUrl.replaceFirst("^http", "ws") + "/admin/ws";
-        Request request = new Request.Builder()
-                .url(url)
-                .addHeader("Authorization", authHeader)
-                .build();
+        Request request;
+        try {
+            request = new Request.Builder()
+                    .url(url)
+                    .addHeader("Authorization", authHeader)
+                    .build();
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
         return client.newWebSocket(request, listener);
     }
 

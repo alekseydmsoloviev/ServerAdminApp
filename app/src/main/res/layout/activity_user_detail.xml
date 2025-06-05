@@ -8,6 +8,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
+        <ImageButton
+            android:id="@+id/back_button"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="@android:color/transparent"
+            android:src="@drawable/ic_back"
+            android:tint="@android:color/white" />
+
         <TextView
             android:id="@+id/detail_username"
             android:layout_width="match_parent"
@@ -54,7 +62,7 @@
             android:id="@+id/detail_chats"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="" />
+            android:text="@string/empty" />
 
         <LinearLayout
             android:orientation="horizontal"
@@ -65,12 +73,12 @@
                 android:id="@+id/detail_edit"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Edit" />
+                android:text="@string/edit" />
             <Button
                 android:id="@+id/detail_delete"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Delete" />
+                android:text="@string/delete" />
         </LinearLayout>
     </LinearLayout>
 </ScrollView>

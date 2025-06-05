@@ -5,6 +5,14 @@
     android:orientation="vertical"
     android:padding="16dp">
 
+    <ImageButton
+        android:id="@+id/back_button"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:background="@android:color/transparent"
+        android:src="@drawable/ic_back"
+        android:tint="@android:color/white" />
+
     <ListView
         android:id="@+id/models_list"
         android:layout_width="match_parent"
@@ -14,23 +22,25 @@
     <Spinner
         android:id="@+id/available_spinner"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="56dp"
+        android:padding="8dp" />
 
     <Spinner
         android:id="@+id/variant_spinner"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="56dp"
+        android:padding="8dp" />
 
     <Button
         android:id="@+id/install_model_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Install" />
+        android:text="@string/install" />
 
     <TextView
         android:id="@+id/progress_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text=""
+        android:text="@string/empty"
         android:paddingTop="8dp" />
 </LinearLayout>
