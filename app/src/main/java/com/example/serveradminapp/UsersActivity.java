@@ -9,6 +9,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.LinearLayout;
+import android.view.View;
 import java.util.ArrayList;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -37,6 +38,9 @@ public class UsersActivity extends AppCompatActivity {
             return;
         }
         setContentView(R.layout.activity_users);
+
+        View backButton = findViewById(R.id.back_button);
+        backButton.setOnClickListener(v -> finish());
 
         listView = findViewById(R.id.users_list);
         Button addButton = findViewById(R.id.add_user_button);

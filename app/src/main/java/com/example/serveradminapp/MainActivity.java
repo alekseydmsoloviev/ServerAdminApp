@@ -6,7 +6,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.widget.TextView;
 import android.view.View;
-
 import com.example.serveradminapp.GaugeView;
 
 import androidx.annotation.NonNull;
@@ -30,11 +29,14 @@ public class MainActivity extends AppCompatActivity {
     private GaugeView netGauge;
     private GaugeView diskGauge;
 
+    private WebSocket metricsSocket;
+    private final Runnable reconnectRunnable = this::connectMetrics;
     private final Handler statusHandler = new Handler(Looper.getMainLooper());
     private final Runnable statusTimeout = () -> serverStateText.setText("Status: Stop");
 
     private void setStatusWork() {
         statusHandler.removeCallbacks(statusTimeout);
+        statusHandler.removeCallbacks(reconnectRunnable);
         statusHandler.post(() -> serverStateText.setText("Status: Work"));
         statusHandler.postDelayed(statusTimeout, 15000);
     }
@@ -42,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
     private void setStatusStop() {
         statusHandler.removeCallbacks(statusTimeout);
         statusHandler.post(() -> serverStateText.setText("Status: Stop"));
+        statusHandler.postDelayed(reconnectRunnable, 5000);
     }
 
     @Override
@@ -57,6 +60,8 @@ public class MainActivity extends AppCompatActivity {
 
         serverStateText = findViewById(R.id.server_state_text);
         serverStateText.setText("Status: Stop");
+        View backButton = findViewById(R.id.back_button);
+        backButton.setOnClickListener(v -> finish());
         messages24hText = findViewById(R.id.messages_24h_text);
         messagesTotalText = findViewById(R.id.messages_total_text);
         cpuGauge = findViewById(R.id.cpu_gauge);
@@ -89,7 +94,28 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void connectMetrics() {
-        ServerApi.get().connectMetrics(new WebSocketListener() {
+        if (metricsSocket != null) {
+            metricsSocket.cancel();
+            metricsSocket = null;
+        }
+        metricsSocket = ServerApi.get().connectMetrics(new WebSocketListener() {
+            @Override
+            public void onOpen(@NonNull WebSocket webSocket, @NonNull okhttp3.Response response) {
+                metricsSocket = webSocket;
+                setStatusWork();
+            }
+
+            @Override
+            public void onClosed(@NonNull WebSocket webSocket, int code, @NonNull String reason) {
+                metricsSocket = null;
+                setStatusStop();
+            }
+
+            @Override
+            public void onFailure(@NonNull WebSocket webSocket, @NonNull Throwable t, okhttp3.Response response) {
+                metricsSocket = null;
+                setStatusStop();
+            }
             @Override
             public void onOpen(@NonNull WebSocket webSocket, @NonNull okhttp3.Response response) {
                 setStatusWork();
@@ -123,7 +149,6 @@ public class MainActivity extends AppCompatActivity {
 
                         setStatusWork();
                         runOnUiThread(() -> {
-
                             if (day > 0) messages24hText.setText("Messages last 24h: " + day);
                             if (total > 0) messagesTotalText.setText("Messages total: " + total);
                             cpuGauge.setPercent(cpu);
@@ -181,5 +206,12 @@ public class MainActivity extends AppCompatActivity {
             messages24hText.setText("Messages last 24h: " + count24h);
             messagesTotalText.setText("Messages total: " + countTotal);
         });
+    }
+
+    @Override
+    protected void onDestroy() {
+        statusHandler.removeCallbacks(reconnectRunnable);
+        if (metricsSocket != null) metricsSocket.cancel();
+        super.onDestroy();
     }
 }

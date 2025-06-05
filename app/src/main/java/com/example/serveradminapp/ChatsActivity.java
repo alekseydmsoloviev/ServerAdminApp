@@ -43,6 +43,8 @@ public class ChatsActivity extends AppCompatActivity {
             return;
         }
         setContentView(R.layout.activity_chats);
+        View backButton = findViewById(R.id.back_button);
+        backButton.setOnClickListener(v -> finish());
 
         ListView listView = findViewById(R.id.chats_list);
         Spinner sortSpinner = findViewById(R.id.sort_spinner);
