@@ -7,6 +7,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.ArrayAdapter;
+import android.widget.AdapterView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -46,24 +49,31 @@ public class SettingsFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         EditText portEdit = view.findViewById(R.id.port_edit);
         EditText limitEdit = view.findViewById(R.id.limit_edit);
-        Button langEn = view.findViewById(R.id.lang_en);
-        Button langRu = view.findViewById(R.id.lang_ru);
+        Spinner langSpinner = view.findViewById(R.id.lang_spinner);
 
-        String current = requireActivity().getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
-                .getString("lang", Locale.getDefault().getLanguage());
-        updateLangButtons(langEn, langRu, current);
+        ArrayAdapter<CharSequence> langAdapter = ArrayAdapter.createFromResource(requireContext(),
+                R.array.languages, R.layout.spinner_item_big);
+        langAdapter.setDropDownViewResource(R.layout.spinner_dropdown_big);
+        langSpinner.setAdapter(langAdapter);
+        langSpinner.setSelection("ru".equals(requireActivity().getSharedPreferences("app_prefs",
+                Context.MODE_PRIVATE).getString("lang", Locale.getDefault().getLanguage())) ? 1 : 0);
+        langSpinner.post(() -> langSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            int last = langSpinner.getSelectedItemPosition();
 
-        langEn.setOnClickListener(v -> {
-            LocaleUtil.setLocale(requireContext(), "en");
-            updateLangButtons(langEn, langRu, "en");
-            requireActivity().recreate();
-        });
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view1, int position, long id) {
+                if (position != last) {
+                    last = position;
+                    String lang = position == 1 ? "ru" : "en";
+                    LocaleUtil.setLocale(requireContext(), lang);
+                    requireActivity().recreate();
+                }
+            }
 
-        langRu.setOnClickListener(v -> {
-            LocaleUtil.setLocale(requireContext(), "ru");
-            updateLangButtons(langEn, langRu, "ru");
-            requireActivity().recreate();
-        });
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        }));
         Button saveButton = view.findViewById(R.id.save_button);
         Button restartButton = view.findViewById(R.id.restart_button);
 
@@ -144,17 +154,5 @@ public class SettingsFragment extends Fragment {
                         android.widget.Toast.makeText(requireContext(), getString(R.string.restarting), android.widget.Toast.LENGTH_SHORT).show());
             }
         });
-    }
-
-    private void updateLangButtons(Button en, Button ru, String lang) {
-        int sel = requireContext().getColor(R.color.purple_500);
-        int unsel = requireContext().getColor(R.color.lang_unselected);
-        if ("ru".equals(lang)) {
-            ru.setBackgroundColor(sel);
-            en.setBackgroundColor(unsel);
-        } else {
-            en.setBackgroundColor(sel);
-            ru.setBackgroundColor(unsel);
-        }
     }
 }
