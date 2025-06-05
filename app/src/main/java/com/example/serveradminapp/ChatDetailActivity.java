@@ -116,5 +116,4 @@ public class ChatDetailActivity extends AppCompatActivity {
         html = html.replace("\n", "<br>");
         return Html.fromHtml(html, Html.FROM_HTML_MODE_LEGACY);
     }
-
 }
