@@ -28,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
     private GaugeView memGauge;
     private GaugeView netGauge;
     private GaugeView diskGauge;
+
     private WebSocket metricsSocket;
     private final Runnable reconnectRunnable = this::connectMetrics;
     private final Handler statusHandler = new Handler(Looper.getMainLooper());
@@ -116,6 +117,24 @@ public class MainActivity extends AppCompatActivity {
                 setStatusStop();
             }
             @Override
+            public void onOpen(@NonNull WebSocket webSocket, @NonNull okhttp3.Response response) {
+                setStatusWork();
+
+            }
+
+            @Override
+            public void onClosed(@NonNull WebSocket webSocket, int code, @NonNull String reason) {
+
+                setStatusStop();
+
+            }
+
+            @Override
+            public void onFailure(@NonNull WebSocket webSocket, @NonNull Throwable t, okhttp3.Response response) {
+                setStatusStop();
+
+            }
+            @Override
             public void onMessage(@NonNull WebSocket webSocket, @NonNull String text) {
                 try {
                     JSONObject obj = new JSONObject(text);
@@ -127,6 +146,7 @@ public class MainActivity extends AppCompatActivity {
                         final int mem = (int) Math.round(obj.optDouble("memory"));
                         final int net = (int) Math.round(obj.optDouble("network"));
                         final int disk = (int) Math.round(obj.optDouble("disk"));
+
                         setStatusWork();
                         runOnUiThread(() -> {
                             if (day > 0) messages24hText.setText("Messages last 24h: " + day);
