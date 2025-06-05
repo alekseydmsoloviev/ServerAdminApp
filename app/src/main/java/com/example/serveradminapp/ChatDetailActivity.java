@@ -120,7 +120,10 @@ public class ChatDetailActivity extends AppCompatActivity {
 
         html = html.replaceAll("`(.+?)`", "<tt>$1</tt>");
 
-        html = html.replaceAll("(?m)^[\\*-]\\s+(.+)$", "&#8226; $1");
+        html = html.replaceAll("\\[(.+?)\\]\\((.+?)\\)", "<a href=\"$2\">$1</a>");
+        html = html.replaceAll("\\[(https?://[^\\]]+)\\]", "<a href=\"$1\">$1</a>");
+
+        html = html.replaceAll("(?m)^\\s*[\\*-]\\s+(.+)$", "&#8226; $1");
 
         html = html.replace("\n", "<br>");
 
