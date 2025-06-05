@@ -98,25 +98,13 @@ public class ChatDetailActivity extends AppCompatActivity {
                     final String title = pageTitle;
                     runOnUiThread(() -> {
                         setTitle(title);
-                        view.setText(markdownToSpanned(text));
+                        view.setText(text);
                     });
                 } catch (JSONException ex) {
                     runOnUiThread(() -> view.setText(getString(R.string.error)));
                 }
             }
         });
-    }
-
-    private Spanned markdownToSpanned(String md) {
-        String html = md
-                .replace("&", "&amp;")
-                .replace("<", "&lt;")
-                .replace(">", "&gt;");
-        html = html.replaceAll("\\*\\*(.+?)\\*\\*", "<b>$1</b>");
-        html = html.replaceAll("\\*(.+?)\\*", "<i>$1</i>");
-        html = html.replaceAll("`(.+?)`", "<tt>$1</tt>");
-        html = html.replace("\n", "<br>");
-        return Html.fromHtml(html, Html.FROM_HTML_MODE_LEGACY);
     }
 
 }
