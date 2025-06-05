@@ -31,6 +31,12 @@ public class GaugeView extends View {
         init();
     }
 
+
+    public GaugeView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+        super(context, attrs, defStyleAttr, defStyleRes);
+        init();
+    }
+
     private void init() {
         bgPaint.setStyle(Paint.Style.STROKE);
         bgPaint.setColor(Color.LTGRAY);
@@ -48,6 +54,17 @@ public class GaugeView extends View {
     }
 
     @Override
+
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        int size = Math.min(MeasureSpec.getSize(widthMeasureSpec), MeasureSpec.getSize(heightMeasureSpec));
+        if (size == 0) {
+            size = Math.max(MeasureSpec.getSize(widthMeasureSpec), MeasureSpec.getSize(heightMeasureSpec));
+        }
+        setMeasuredDimension(size, size);
+    }
+
+    @Override
+
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         int size = Math.min(getWidth(), getHeight());
