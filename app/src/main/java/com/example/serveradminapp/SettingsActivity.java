@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.content.Intent;
 import android.widget.Button;
 import android.widget.EditText;
+import android.view.View;
+import java.util.Locale;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,6 +21,7 @@ public class SettingsActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        LocaleUtil.apply(this);
         super.onCreate(savedInstanceState);
         ServerApi.restore(this);
         if (ServerApi.get() == null) {
@@ -27,14 +30,19 @@ public class SettingsActivity extends AppCompatActivity {
             return;
         }
         setContentView(R.layout.activity_settings);
+        View backButton = findViewById(R.id.back_button);
+        backButton.setOnClickListener(v -> finish());
         EditText portEdit = findViewById(R.id.port_edit);
         EditText limitEdit = findViewById(R.id.limit_edit);
+        android.widget.Spinner langSpinner = findViewById(R.id.lang_spinner);
+        langSpinner.setAdapter(android.widget.ArrayAdapter.createFromResource(this, R.array.languages, android.R.layout.simple_spinner_item));
+        langSpinner.setSelection("ru".equals(getSharedPreferences("app_prefs", MODE_PRIVATE).getString("lang", Locale.getDefault().getLanguage())) ? 1 : 0);
         Button saveButton = findViewById(R.id.save_button);
         Button restartButton = findViewById(R.id.restart_button);
 
         loadConfig(portEdit, limitEdit);
 
-        saveButton.setOnClickListener(v -> saveConfig(portEdit, limitEdit));
+        saveButton.setOnClickListener(v -> saveConfig(portEdit, limitEdit, langSpinner));
         restartButton.setOnClickListener(v -> restartServer());
     }
 
@@ -42,7 +50,7 @@ public class SettingsActivity extends AppCompatActivity {
         ServerApi.get().loadConfig(new okhttp3.Callback() {
             @Override
             public void onFailure(@NonNull okhttp3.Call call, @NonNull IOException e) {
-                runOnUiThread(() -> android.widget.Toast.makeText(SettingsActivity.this, "Failed to load config", android.widget.Toast.LENGTH_SHORT).show());
+                runOnUiThread(() -> android.widget.Toast.makeText(SettingsActivity.this, getString(R.string.failed_load), android.widget.Toast.LENGTH_SHORT).show());
             }
 
             @Override
@@ -67,26 +75,28 @@ public class SettingsActivity extends AppCompatActivity {
         });
     }
 
-    private void saveConfig(EditText portEdit, EditText limitEdit) {
+    private void saveConfig(EditText portEdit, EditText limitEdit, android.widget.Spinner langSpinner) {
         JSONObject obj = new JSONObject();
         try {
             obj.put("port", Integer.parseInt(portEdit.getText().toString().trim()));
             obj.put("daily_limit", Integer.parseInt(limitEdit.getText().toString().trim()));
         } catch (JSONException e) {
-            android.widget.Toast.makeText(this, "Invalid input", android.widget.Toast.LENGTH_SHORT).show();
+            android.widget.Toast.makeText(this, getString(R.string.invalid_input), android.widget.Toast.LENGTH_SHORT).show();
             return;
         }
         RequestBody body = RequestBody.create(obj.toString(), MediaType.get("application/json"));
+        String lang = langSpinner.getSelectedItemPosition() == 1 ? "ru" : "en";
+        LocaleUtil.setLocale(this, lang);
         ServerApi.get().updateConfig(body, new okhttp3.Callback() {
             @Override
             public void onFailure(@NonNull okhttp3.Call call, @NonNull IOException e) {
-                runOnUiThread(() -> android.widget.Toast.makeText(SettingsActivity.this, "Failed to save", android.widget.Toast.LENGTH_SHORT).show());
+                runOnUiThread(() -> android.widget.Toast.makeText(SettingsActivity.this, getString(R.string.failed), android.widget.Toast.LENGTH_SHORT).show());
             }
 
             @Override
             public void onResponse(@NonNull okhttp3.Call call, @NonNull okhttp3.Response response) throws IOException {
                 response.close();
-                runOnUiThread(() -> android.widget.Toast.makeText(SettingsActivity.this, response.isSuccessful() ? "Saved" : "Error", android.widget.Toast.LENGTH_SHORT).show());
+                runOnUiThread(() -> android.widget.Toast.makeText(SettingsActivity.this, response.isSuccessful() ? getString(R.string.saved) : getString(R.string.error), android.widget.Toast.LENGTH_SHORT).show());
             }
         });
     }
@@ -95,13 +105,13 @@ public class SettingsActivity extends AppCompatActivity {
         ServerApi.get().restartServer(new okhttp3.Callback() {
             @Override
             public void onFailure(@NonNull okhttp3.Call call, @NonNull IOException e) {
-                runOnUiThread(() -> android.widget.Toast.makeText(SettingsActivity.this, "Failed", android.widget.Toast.LENGTH_SHORT).show());
+                runOnUiThread(() -> android.widget.Toast.makeText(SettingsActivity.this, getString(R.string.failed), android.widget.Toast.LENGTH_SHORT).show());
             }
 
             @Override
             public void onResponse(@NonNull okhttp3.Call call, @NonNull okhttp3.Response response) throws IOException {
                 response.close();
-                runOnUiThread(() -> android.widget.Toast.makeText(SettingsActivity.this, "Restarting", android.widget.Toast.LENGTH_SHORT).show());
+                runOnUiThread(() -> android.widget.Toast.makeText(SettingsActivity.this, getString(R.string.restarting), android.widget.Toast.LENGTH_SHORT).show());
             }
         });
     }

@@ -35,6 +35,7 @@ public class ChatsActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        LocaleUtil.apply(this);
         super.onCreate(savedInstanceState);
         ServerApi.restore(this);
         if (ServerApi.get() == null) {
@@ -43,6 +44,8 @@ public class ChatsActivity extends AppCompatActivity {
             return;
         }
         setContentView(R.layout.activity_chats);
+        View backButton = findViewById(R.id.back_button);
+        backButton.setOnClickListener(v -> finish());
 
         ListView listView = findViewById(R.id.chats_list);
         Spinner sortSpinner = findViewById(R.id.sort_spinner);
@@ -51,9 +54,8 @@ public class ChatsActivity extends AppCompatActivity {
         adapter = new ChatAdapter();
         listView.setAdapter(adapter);
 
-        ArrayAdapter<String> sortAdapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_spinner_item,
-                new String[]{"User", "Created", "Last msg", "Messages"});
+        ArrayAdapter<CharSequence> sortAdapter = ArrayAdapter.createFromResource(this,
+                R.array.sort_options, android.R.layout.simple_spinner_item);
         sortAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         sortSpinner.setAdapter(sortAdapter);
         sortSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {

@@ -5,28 +5,29 @@
     android:orientation="vertical"
     android:padding="16dp">
 
+
     <EditText
         android:id="@+id/server_edit"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Server (ip:port)" />
+        android:hint="@string/server_hint" />
 
     <EditText
         android:id="@+id/username_edit"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Username" />
+        android:hint="@string/username" />
 
     <EditText
         android:id="@+id/password_edit"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:inputType="textPassword"
-        android:hint="Password" />
+        android:hint="@string/password" />
 
     <Button
         android:id="@+id/login_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Login" />
+        android:text="@string/login" />
 </LinearLayout>

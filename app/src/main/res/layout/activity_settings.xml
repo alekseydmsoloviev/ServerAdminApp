@@ -5,27 +5,40 @@
     android:orientation="vertical"
     android:padding="16dp">
 
+    <ImageButton
+        android:id="@+id/back_button"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:background="@android:color/transparent"
+        android:src="@drawable/ic_back"
+        android:tint="@android:color/white" />
+
     <EditText
         android:id="@+id/port_edit"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Port" />
+        android:hint="@string/port" />
 
     <EditText
         android:id="@+id/limit_edit"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Daily limit" />
+        android:hint="@string/daily_limit" />
+
+    <Spinner
+        android:id="@+id/lang_spinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 
     <Button
         android:id="@+id/save_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Save" />
+        android:text="@string/save" />
 
     <Button
         android:id="@+id/restart_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Restart Server" />
+        android:text="@string/restart_server" />
 </LinearLayout>
