@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.widget.Button;
 import android.widget.EditText;
 import android.view.View;
+import android.content.Context;
 import java.util.Locale;
 
 import androidx.annotation.NonNull;
@@ -20,6 +21,11 @@ import okhttp3.RequestBody;
 public class SettingsActivity extends AppCompatActivity {
 
     @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(LocaleUtil.attach(newBase));
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         LocaleUtil.apply(this);
         super.onCreate(savedInstanceState);
@@ -30,13 +36,14 @@ public class SettingsActivity extends AppCompatActivity {
             return;
         }
         setContentView(R.layout.activity_settings);
-        View backButton = findViewById(R.id.back_button);
-        backButton.setOnClickListener(v -> finish());
         EditText portEdit = findViewById(R.id.port_edit);
         EditText limitEdit = findViewById(R.id.limit_edit);
         android.widget.Spinner langSpinner = findViewById(R.id.lang_spinner);
-        langSpinner.setAdapter(android.widget.ArrayAdapter.createFromResource(this,
-                R.array.languages, android.R.layout.simple_spinner_item));
+        android.widget.ArrayAdapter<CharSequence> langAdapter =
+                android.widget.ArrayAdapter.createFromResource(this,
+                        R.array.languages, R.layout.spinner_item_big);
+        langAdapter.setDropDownViewResource(R.layout.spinner_dropdown_big);
+        langSpinner.setAdapter(langAdapter);
         langSpinner.setSelection("ru".equals(getSharedPreferences("app_prefs",
                 MODE_PRIVATE).getString("lang", Locale.getDefault().getLanguage())) ? 1 : 0);
         langSpinner.post(() -> langSpinner.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {

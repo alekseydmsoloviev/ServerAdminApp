@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
 import android.content.SharedPreferences;
+import android.content.Context;
 import com.example.serveradminapp.databinding.ActivityLoginBinding;
 
 import androidx.annotation.NonNull;
@@ -17,6 +18,11 @@ public class LoginActivity extends AppCompatActivity {
     private EditText usernameEdit;
     private EditText passwordEdit;
     private EditText serverEdit;
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(LocaleUtil.attach(newBase));
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
