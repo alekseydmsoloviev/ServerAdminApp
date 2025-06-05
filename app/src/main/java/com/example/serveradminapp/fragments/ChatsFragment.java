@@ -1,7 +1,8 @@
-package com.example.serveradminapp;
+package com.example.serveradminapp.fragments;
 
-import android.os.Bundle;
+import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,10 +11,15 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.content.Context;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+
+import com.example.serveradminapp.ChatDetailActivity;
+import com.example.serveradminapp.LocaleUtil;
+import com.example.serveradminapp.R;
+import com.example.serveradminapp.ServerApi;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -28,43 +34,43 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.Locale;
 
-public class ChatsActivity extends AppCompatActivity {
+public class ChatsFragment extends Fragment {
 
     private final ArrayList<JSONObject> chatList = new ArrayList<>();
     private ChatAdapter adapter;
     private String sortField = "created_at";
 
     @Override
-    protected void attachBaseContext(Context newBase) {
-        super.attachBaseContext(LocaleUtil.attach(newBase));
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        LocaleUtil.attach(context);
+        LocaleUtil.apply(requireActivity());
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.activity_chats, container, false);
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        LocaleUtil.apply(this);
-        super.onCreate(savedInstanceState);
-        ServerApi.restore(this);
-        if (ServerApi.get() == null) {
-            startActivity(new Intent(this, LoginActivity.class));
-            finish();
-            return;
-        }
-        setContentView(R.layout.activity_chats);
-
-        ListView listView = findViewById(R.id.chats_list);
-        Spinner sortSpinner = findViewById(R.id.sort_spinner);
-        View refreshButton = findViewById(R.id.refresh_button);
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        ListView listView = view.findViewById(R.id.chats_list);
+        Spinner sortSpinner = view.findViewById(R.id.sort_spinner);
+        View refreshButton = view.findViewById(R.id.refresh_button);
 
         adapter = new ChatAdapter();
         listView.setAdapter(adapter);
 
-        ArrayAdapter<CharSequence> sortAdapter = ArrayAdapter.createFromResource(this,
+        ArrayAdapter<CharSequence> sortAdapter = ArrayAdapter.createFromResource(requireContext(),
                 R.array.sort_options, android.R.layout.simple_spinner_item);
         sortAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         sortSpinner.setAdapter(sortAdapter);
         sortSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            public void onItemSelected(AdapterView<?> parent, View itemView, int position, long id) {
                 switch (position) {
                     case 0: sortField = "username"; break;
                     case 1: sortField = "created_at"; break;
@@ -80,11 +86,18 @@ public class ChatsActivity extends AppCompatActivity {
 
         listView.setOnItemClickListener((p,v,pos,id)->{
             JSONObject obj = chatList.get(pos);
-            Intent intent = new Intent(ChatsActivity.this, ChatDetailActivity.class);
-            intent.putExtra("session_id", obj.optString("session_id"));
+            Intent intent = new Intent(requireContext(), ChatDetailActivity.class);
+            String sid = obj.optString("session_id", obj.optString("id"));
+            intent.putExtra("session_id", sid);
             startActivity(intent);
         });
 
+        loadChats();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
         loadChats();
     }
 
@@ -92,7 +105,7 @@ public class ChatsActivity extends AppCompatActivity {
         ServerApi.get().listSessions(new okhttp3.Callback() {
             @Override
             public void onFailure(@NonNull okhttp3.Call call, @NonNull IOException e) {
-                runOnUiThread(() -> {
+                requireActivity().runOnUiThread(() -> {
                     chatList.clear();
                     adapter.notifyDataSetChanged();
                 });
@@ -109,7 +122,7 @@ public class ChatsActivity extends AppCompatActivity {
                     for (int i=0;i<arr.length();i++) {
                         chatList.add(arr.getJSONObject(i));
                     }
-                    runOnUiThread(() -> sortAndUpdate());
+                    requireActivity().runOnUiThread(() -> sortAndUpdate());
                 } catch (JSONException ex) {
                     // ignore
                 }
@@ -117,18 +130,10 @@ public class ChatsActivity extends AppCompatActivity {
         });
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        loadChats();
-    }
-
     private void sortAndUpdate() {
         Collections.sort(chatList, new Comparator<JSONObject>() {
             final SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US);
-            private long parseDate(String s) {
-                try { Date d = fmt.parse(s); return d==null?0:d.getTime(); } catch (ParseException e) { return 0; }
-            }
+            private long parseDate(String s) { try { Date d = fmt.parse(s); return d==null?0:d.getTime(); } catch (ParseException e) { return 0; } }
             @Override
             public int compare(JSONObject o1, JSONObject o2) {
                 if ("message_count".equals(sortField)) {
@@ -146,7 +151,7 @@ public class ChatsActivity extends AppCompatActivity {
     }
 
     private class ChatAdapter extends ArrayAdapter<JSONObject> {
-        ChatAdapter() { super(ChatsActivity.this, 0, chatList); }
+        ChatAdapter() { super(requireContext(), 0, chatList); }
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
@@ -174,7 +179,7 @@ public class ChatsActivity extends AppCompatActivity {
                     @Override public void onResponse(@NonNull okhttp3.Call call, @NonNull okhttp3.Response response) throws IOException {
                         response.close();
                         if (response.isSuccessful()) {
-                            runOnUiThread(() -> {
+                            requireActivity().runOnUiThread(() -> {
                                 chatList.remove(obj);
                                 notifyDataSetChanged();
                             });
