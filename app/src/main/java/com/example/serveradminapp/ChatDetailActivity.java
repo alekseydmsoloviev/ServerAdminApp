@@ -3,11 +3,10 @@ package com.example.serveradminapp;
 import android.os.Bundle;
 import android.content.Intent;
 import android.widget.TextView;
-import android.widget.Button;
-import android.text.TextUtils;
 import android.view.View;
 import android.content.Context;
-import androidx.core.text.HtmlCompat;
+import android.text.Html;
+import android.text.Spanned;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -52,9 +51,7 @@ public class ChatDetailActivity extends AppCompatActivity {
         messagesView.setText(R.string.loading);
 
         View refreshButton = findViewById(R.id.refresh_button);
-        View backButton = findViewById(R.id.back_button);
         refreshButton.setOnClickListener(v -> loadMessages(sessionId, messagesView));
-        backButton.setOnClickListener(v -> finish());
 
         loadMessages(sessionId, messagesView);
     }
@@ -85,22 +82,21 @@ public class ChatDetailActivity extends AppCompatActivity {
                     if (arr != null && arr.length() > 0) {
                         for (int i = 0; i < arr.length(); i++) {
                             JSONObject m = arr.getJSONObject(i);
-                            sb.append("<p><b>")
-                              .append(TextUtils.htmlEncode(m.optString("username")))
+                            sb.append(m.optString("username"))
                               .append(" (")
-                              .append(TextUtils.htmlEncode(m.optString("role")))
-                              .append("):</b><br>")
-                              .append(mdToHtml(m.optString("content")))
-                              .append("</p>");
+                              .append(m.optString("role"))
+                              .append("):\n")
+                              .append(m.optString("content"))
+                              .append("\n\n");
                         }
                     } else {
                         sb.append(getString(R.string.no_messages));
                     }
-                    final CharSequence text = HtmlCompat.fromHtml(sb.toString(), HtmlCompat.FROM_HTML_MODE_LEGACY);
+                    final String text = sb.toString();
                     final String title = pageTitle;
                     runOnUiThread(() -> {
                         setTitle(title);
-                        view.setText(text);
+                        view.setText(markdownToSpanned(text));
                     });
                 } catch (JSONException ex) {
                     runOnUiThread(() -> view.setText(getString(R.string.error)));
@@ -109,14 +105,16 @@ public class ChatDetailActivity extends AppCompatActivity {
         });
     }
 
-    /** Very small subset of Markdown to HTML conversion */
-    private String mdToHtml(String md) {
-        String html = TextUtils.htmlEncode(md);
+    private Spanned markdownToSpanned(String md) {
+        String html = md
+                .replace("&", "&amp;")
+                .replace("<", "&lt;")
+                .replace(">", "&gt;");
+        html = html.replaceAll("\\*\\*(.+?)\\*\\*", "<b>$1</b>");
+        html = html.replaceAll("\\*(.+?)\\*", "<i>$1</i>");
+        html = html.replaceAll("`(.+?)`", "<tt>$1</tt>");
         html = html.replace("\n", "<br>");
-        // Quote meta characters so we don't run into illegal escape sequences
-        html = html.replaceAll("\\Q**\\E(.+?)\\Q**\\E", "<b>$1</b>");
-        html = html.replaceAll("\\Q*\\E(.+?)\\Q*\\E", "<i>$1</i>");
-        html = html.replaceAll("\\Q`\\E(.+?)\\Q`\\E", "<tt>$1</tt>");
-        return html;
+        return Html.fromHtml(html, Html.FROM_HTML_MODE_LEGACY);
     }
+
 }
