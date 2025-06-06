@@ -50,7 +50,7 @@ public class ChatDetailActivity extends AppCompatActivity {
         TextView messagesView = findViewById(R.id.messages_text);
         TextView titleView = findViewById(R.id.chat_title);
         TextView modelView = findViewById(R.id.chat_model);
-        messagesView.setLineSpacing(0f, 1.2f);
+        messagesView.setLineSpacing(0f, 1.4f);
         messagesView.setText(R.string.loading);
 
         View refreshButton = findViewById(R.id.refresh_button);
@@ -121,8 +121,8 @@ public class ChatDetailActivity extends AppCompatActivity {
     private Spanned markdownToSpanned(String md) {
         String html = Html.escapeHtml(md);
 
-        html = html.replaceAll("\\*\\*(.+?)\\*\\*", "<b>$1</b>");
-        html = html.replaceAll("__(.+?)__", "<b>$1</b>");
+        html = html.replaceAll("\\*\\*(.+?)\\*\\*", "<h3>$1</h3>");
+        html = html.replaceAll("__(.+?)__", "<h3>$1</h3>");
 
         html = html.replaceAll("~~(.+?)~~", "<strike>$1</strike>");
 
