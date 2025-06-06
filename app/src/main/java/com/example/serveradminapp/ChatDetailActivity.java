@@ -52,6 +52,7 @@ public class ChatDetailActivity extends AppCompatActivity {
         TextView titleView = findViewById(R.id.chat_title);
         TextView modelView = findViewById(R.id.chat_model);
         messagesView.setLineSpacing(0f, 1.5f);
+
         messagesView.setMovementMethod(LinkMovementMethod.getInstance());
         messagesView.setText(R.string.loading);
 
