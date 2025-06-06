@@ -56,4 +56,5 @@
     <string name="delete_q">Удалить %1$s?</string>
     <string name="back">Назад</string>
     <string name="no_messages">Сообщений нет</string>
+    <string name="model_label">Модель: %1$s</string>
 </resources>
