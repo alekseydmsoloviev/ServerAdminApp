@@ -53,7 +53,6 @@ public class ChatDetailActivity extends AppCompatActivity {
         TextView modelView = findViewById(R.id.chat_model);
         messagesView.setLineSpacing(0f, 1.4f);
         messagesView.setMovementMethod(LinkMovementMethod.getInstance());
-
         messagesView.setText(R.string.loading);
 
         View refreshButton = findViewById(R.id.refresh_button);
@@ -94,12 +93,13 @@ public class ChatDetailActivity extends AppCompatActivity {
                         sessionModel = first.optString("model");
                         for (int i = 0; i < arr.length(); i++) {
                             JSONObject m = arr.getJSONObject(i);
-                            sb.append(m.optString("username"))
-                              .append(" (")
-                              .append(m.optString("role"))
-                              .append("):\n")
-                              .append(m.optString("content"))
-                              .append("\n\n");
+                            String role = m.optString("role");
+                            if ("assistant".equals(role)) {
+                                sb.append("AI:\n");
+                            } else {
+                                sb.append(m.optString("username")).append(":\n");
+                            }
+                            sb.append(m.optString("content")).append("\n\n");
                         }
                     } else {
                         sb.append(getString(R.string.no_messages));
