@@ -7,6 +7,7 @@ import android.view.View;
 import android.content.Context;
 import android.text.Html;
 import android.text.Spanned;
+import android.text.method.LinkMovementMethod;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -51,6 +52,8 @@ public class ChatDetailActivity extends AppCompatActivity {
         TextView titleView = findViewById(R.id.chat_title);
         TextView modelView = findViewById(R.id.chat_model);
         messagesView.setLineSpacing(0f, 1.4f);
+        messagesView.setMovementMethod(LinkMovementMethod.getInstance());
+
         messagesView.setText(R.string.loading);
 
         View refreshButton = findViewById(R.id.refresh_button);
@@ -108,7 +111,7 @@ public class ChatDetailActivity extends AppCompatActivity {
                     runOnUiThread(() -> {
                         setTitle(title);
                         titleView.setText(title);
-                        modelView.setText(model);
+                        modelView.setText(getString(R.string.model_label, model));
                         view.setText(markdownToSpanned(text));
                     });
                 } catch (JSONException ex) {
