@@ -7,6 +7,7 @@ import android.view.View;
 import android.content.Context;
 import android.text.Html;
 import android.text.Spanned;
+import android.text.method.LinkMovementMethod;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -48,18 +49,22 @@ public class ChatDetailActivity extends AppCompatActivity {
         }
 
         TextView messagesView = findViewById(R.id.messages_text);
+        TextView titleView = findViewById(R.id.chat_title);
+        TextView modelView = findViewById(R.id.chat_model);
+        messagesView.setLineSpacing(0f, 1.4f);
+        messagesView.setMovementMethod(LinkMovementMethod.getInstance());
         messagesView.setText(R.string.loading);
 
         View refreshButton = findViewById(R.id.refresh_button);
         View backButton = findViewById(R.id.back_button);
 
-        refreshButton.setOnClickListener(v -> loadMessages(sessionId, messagesView));
+        refreshButton.setOnClickListener(v -> loadMessages(sessionId, messagesView, titleView, modelView));
         backButton.setOnClickListener(v -> finish());
 
-        loadMessages(sessionId, messagesView);
+        loadMessages(sessionId, messagesView, titleView, modelView);
     }
 
-    private void loadMessages(String id, TextView view) {
+    private void loadMessages(String id, TextView view, TextView titleView, TextView modelView) {
         ServerApi.get().getSession(id, new okhttp3.Callback() {
             @Override
             public void onFailure(@NonNull okhttp3.Call call, @NonNull IOException e) {
@@ -81,27 +86,33 @@ public class ChatDetailActivity extends AppCompatActivity {
                     JSONObject obj = new JSONObject(body);
                     String pageTitle = obj.optString("title", obj.optString("session_id"));
                     JSONArray arr = obj.optJSONArray("messages");
+                    String sessionModel = "";
                     StringBuilder sb = new StringBuilder();
                     if (arr != null && arr.length() > 0) {
+                        JSONObject first = arr.getJSONObject(0);
+                        sessionModel = first.optString("model");
                         for (int i = 0; i < arr.length(); i++) {
                             JSONObject m = arr.getJSONObject(i);
-                            sb.append(m.optString("username"))
-                              .append(" (")
-                              .append(m.optString("role"))
-                              .append("):\n")
-                              .append(m.optString("content"))
-                              .append("\n\n");
+                            String role = m.optString("role");
+                            if ("assistant".equals(role)) {
+                                sb.append("AI:\n");
+                            } else {
+                                sb.append(m.optString("username")).append(":\n");
+                            }
+                            sb.append(m.optString("content")).append("\n\n");
                         }
                     } else {
                         sb.append(getString(R.string.no_messages));
                     }
 
                     final String text = sb.toString();
-
                     final String title = pageTitle;
+                    final String model = sessionModel;
                     runOnUiThread(() -> {
                         setTitle(title);
-                        view.setText(text);
+                        titleView.setText(title);
+                        modelView.setText(getString(R.string.model_label, model));
+                        view.setText(markdownToSpanned(text));
                     });
                 } catch (JSONException ex) {
                     runOnUiThread(() -> view.setText(getString(R.string.error)));
@@ -113,8 +124,8 @@ public class ChatDetailActivity extends AppCompatActivity {
     private Spanned markdownToSpanned(String md) {
         String html = Html.escapeHtml(md);
 
-        html = html.replaceAll("\\*\\*(.+?)\\*\\*", "<b>$1</b>");
-        html = html.replaceAll("__(.+?)__", "<b>$1</b>");
+        html = html.replaceAll("\\*\\*(.+?)\\*\\*", "<h3>$1</h3>");
+        html = html.replaceAll("__(.+?)__", "<h3>$1</h3>");
 
         html = html.replaceAll("~~(.+?)~~", "<strike>$1</strike>");
 
