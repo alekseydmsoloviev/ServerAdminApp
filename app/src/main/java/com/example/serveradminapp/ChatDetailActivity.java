@@ -53,6 +53,7 @@ public class ChatDetailActivity extends AppCompatActivity {
         TextView modelView = findViewById(R.id.chat_model);
         messagesView.setLineSpacing(0f, 1.4f);
         messagesView.setMovementMethod(LinkMovementMethod.getInstance());
+
         messagesView.setText(R.string.loading);
 
         View refreshButton = findViewById(R.id.refresh_button);
