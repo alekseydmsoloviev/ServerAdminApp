@@ -31,6 +31,25 @@
             android:src="@android:drawable/ic_popup_sync" />
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/chat_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingTop="8dp" />
+
+    <TextView
+        android:id="@+id/chat_model"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingBottom="8dp" />
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
